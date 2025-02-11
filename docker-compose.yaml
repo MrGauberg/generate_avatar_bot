@@ -1,0 +1,74 @@
+volumes:
+  pg_data:
+  static:
+  media:
+
+services:
+  db:
+    image: postgres:13
+    env_file: .env
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend/
+    entrypoint: sh entrypoint.sh
+    env_file: .env
+    depends_on:
+      - db
+    volumes:
+      - media:/app/media/
+      - static:/app/staticfiles/
+    environment:
+      DJANGO_SETTINGS_MODULE: core.settings
+      PYTHONPATH: /app
+    command: ["make", "start"]
+
+  nginx:
+    build: ./nginx/
+    env_file: .env
+    ports:
+      - "8080:80"
+    volumes:
+      - static:/staticfiles/
+      - media:/media/
+    depends_on:
+      - backend
+
+  redis:
+    image: "redis:6.2-alpine"
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  celery:
+    build:
+      context: ./backend/
+    entrypoint: sh entrypoint.sh
+    env_file: .env
+    command: celery -A core worker --loglevel=info
+    volumes:
+      - ./backend/:/app
+    depends_on:
+      - redis
+      - db
+    environment:
+      DJANGO_SETTINGS_MODULE: core.settings
+      PYTHONPATH: /app
+    restart: always
+
+  celery_beat:
+    build:
+      context: ./backend/
+    entrypoint: sh entrypoint.sh
+    env_file: .env
+    command: celery -A core beat --loglevel=info
+    volumes:
+      - ./backend/:/app
+    depends_on:
+      - redis
+      - db
+    environment:
+      DJANGO_SETTINGS_MODULE: core.settings
+      PYTHONPATH: /app
+    restart: always
