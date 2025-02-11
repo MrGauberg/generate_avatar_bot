@@ -12,10 +12,20 @@ class BotConfig:
     ADMIN_ID: int = os.getenv("ADMIN_ID")  # ID администратора
     USE_REDIS: bool = os.getenv("USE_REDIS", "False").lower() == "true"  # Использовать Redis?
 
+class UserConfig:
+    email: str = os.getenv("USER_EMAIL")
+    password: str = os.getenv("USER_PASSWORD")
+
 class YookassaConfig:
     SHOP_ID = os.getenv("YOOKASSA_SHOP_ID")
     SECRET_KEY = os.getenv("YOOKASSA_SECRET_KEY")
 
+class ServiceConfig:
+    AVATAR_IMAGES_COUNT: int = int(os.getenv("AVATAR_IMAGES_COUNT", 10))
+
+
 class Settings:
     bot = BotConfig()
     yookassa = YookassaConfig()
+    user = UserConfig()
+    service = ServiceConfig()

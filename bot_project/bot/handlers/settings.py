@@ -1,42 +1,28 @@
 # bot/handlers/settings.py
 
 from aiogram import Router, types
-from aiogram.filters import Command
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from bot.services.api_client import api_client
+from bot.keyboards.inline import settings_keyboard, PHOTO_FORMATS
 
 router = Router()
 
-PHOTO_FORMATS = {
-    "1:1": "1x1",
-    "3:4": "3x4",
-    "9:16": "9x16",
-    "16:9": "16x9"
-}
 
-async def get_settings_keyboard():
-    """Создает клавиатуру для выбора формата фото"""
-    keyboard = ReplyKeyboardMarkup(
-        keyboard=[[KeyboardButton(text=format_option)] for format_option in PHOTO_FORMATS.keys()],
-        resize_keyboard=True
-    )
-    return keyboard
+@router.callback_query(lambda c: c.data == "menu_settings")
+async def settings_menu_callback(callback: types.CallbackQuery):
+    """Обработка нажатия кнопки 'Настройки'"""
+    await callback.message.edit_text("⚙ Выберите формат фото:", reply_markup=settings_keyboard())
+    await callback.answer()
 
 
-@router.message(Command("settings"))
-async def settings_command_handler(message: types.Message):
-    """Команда /settings для изменения настроек"""
-    keyboard = await get_settings_keyboard()
-    await message.answer("⚙ Выберите формат фото:", reply_markup=keyboard)
-
-
-@router.message(lambda message: message.text in PHOTO_FORMATS)
-async def handle_photo_format_selection(message: types.Message):
+@router.callback_query(lambda c: c.data.startswith("settings_"))
+async def handle_photo_format_selection_callback(callback: types.CallbackQuery):
     """Обработка выбора формата фото"""
-    selected_format = PHOTO_FORMATS[message.text]
+    selected_format = callback.data.split("_")[1]
 
     try:
         await api_client._make_request("POST", f"{api_client.BASE_API_URL}/settings/photo-format", {"format": selected_format})
-        await message.answer(f"✅ Формат фото установлен: {message.text}")
+        await callback.message.edit_text(f"✅ Формат фото установлен: {selected_format}")
     except Exception as e:
-        await message.answer(f"❌ Ошибка при установке формата: {e}")
+        await callback.message.edit_text(f"❌ Ошибка при установке формата: {e}")
+
+    await callback.answer()

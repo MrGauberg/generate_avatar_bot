@@ -1,19 +1,18 @@
 # bot/handlers/support.py
 
 from aiogram import Router, types
-from aiogram.filters import Command
+from bot.keyboards.inline import support_keyboard
 
 router = Router()
 
-SUPPORT_USERNAME = "your_support_username"  # Укажите username службы поддержки
 
-@router.message(Command("support"))
-async def support_command_handler(message: types.Message):
-    """Команда /support для обращения в поддержку"""
+@router.callback_query(lambda c: c.data == "menu_support")
+async def support_callback_handler(callback: types.CallbackQuery):
+    """Обработка нажатия кнопки 'Поддержка'"""
     support_text = (
         "📞 **Поддержка**\n\n"
-        "Если у вас возникли вопросы или проблемы, свяжитесь с нашей поддержкой по ссылке ниже:\n\n"
-        f"🔗 [Написать в поддержку](https://t.me/{SUPPORT_USERNAME})"
+        "Если у вас возникли вопросы или проблемы, нажмите кнопку ниже, чтобы связаться с нами:"
     )
 
-    await message.answer(support_text, parse_mode="Markdown", disable_web_page_preview=True)
+    await callback.message.edit_text(support_text, reply_markup=support_keyboard())
+    await callback.answer()

@@ -13,16 +13,16 @@ class APIEndpoints:
     # Авторизация
     @property
     def auth_login(self):
-        return f"{self.BASE_API_URL}/auth/token/"
+        return f"{self.BASE_API_URL}/api/users/token/"
 
     @property
     def auth_refresh(self):
-        return f"{self.BASE_API_URL}/auth/token/refresh/"
+        return f"{self.BASE_API_URL}/api/users/token/refresh/"
 
     # Аватары
     @property
     def create_avatar(self):
-        return f"{self.BASE_API_URL}/avatars/upload/"
+        return f"{self.BASE_API_URL}/api/avatars/upload/"
 
     @property
     def get_avatars(self):
@@ -99,36 +99,56 @@ class APIClient(APIEndpoints):
             raise
 
     async def _make_request(
-        self, method: str, url: str, data: Dict[str, Any] = None
+        self,
+        method: str,
+        url: str,
+        data: Dict[str, Any] = None,
+        files: List[Tuple[str, Tuple[str, bytes, str]]] = None,
+        headers: Dict[str, str] = None
     ) -> Any:
-        """Общий метод для выполнения API-запросов с авторизацией"""
-        headers = {"Authorization": f"Bearer {self.access_token}"}
         try:
-            response = await self.client.request(method, url, json=data, headers=headers)
-            response.raise_for_status()
-            return response.json()
-        except httpx.HTTPStatusError as e:
-            if e.response.status_code == 401:
-                print("Access token expired. Refreshing token...")
-                await self.refresh_access_token()
+            headers = headers or {}
+            if self.access_token:
                 headers["Authorization"] = f"Bearer {self.access_token}"
+
+            if files:
+                response = await self.client.request(method, url, data=data, files=files, headers=headers)
+            else:
                 response = await self.client.request(method, url, json=data, headers=headers)
-                response.raise_for_status()
-                return response.json()
-            raise
+
+            # response.raise_for_status()
+            print(response.json())
+            return response.json()
+
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == 401:  # Ошибка авторизации
+                print("Access token expired. Attempting to refresh token.")
+                try:
+                    await self.refresh_access_token()  # Попробовать обновить токен
+                    headers["Authorization"] = f"Bearer {self.access_token}"
+                    response = await self.client.request(method, url, json=data, headers=headers)
+                    response.raise_for_status()
+                    return response.json()
+                except httpx.HTTPStatusError as refresh_error:
+                    if refresh_error.response.status_code == 401:  # Refresh тоже недействителен
+                        print("Refresh token expired. Re-authenticating.")
+                        await self.authenticate()  # Полная авторизация
+                        headers["Authorization"] = f"Bearer {self.access_token}"
+                        response = await self.client.request(method, url, json=data, headers=headers)
+                        response.raise_for_status()
+                        return response.json()
+                    else:
+                        raise refresh_error
+            else:
+                raise
 
     # Методы API
 
     async def upload_avatar(self, files: List[Tuple[str, Tuple[str, bytes, str]]], gender: str) -> Any:
         """Загрузка аватара"""
-        headers = {"Authorization": f"Bearer {self.access_token}"}
-        form_data = {"gender": gender}
-        try:
-            response = await self.client.post(self.create_avatar, headers=headers, files=files, data=form_data)
-            response.raise_for_status()
-            return response.json()
-        except httpx.HTTPStatusError as e:
-            raise
+        return await self._make_request("POST", self.create_avatar, {"gender": gender}, files
+        )
+
 
     async def get_user_avatars(self) -> Any:
         """Получение списка аватаров"""

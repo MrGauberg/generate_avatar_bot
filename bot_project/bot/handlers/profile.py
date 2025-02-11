@@ -1,19 +1,29 @@
 # bot/handlers/profile.py
 
 from aiogram import Router, types
-from aiogram.filters import Command
 from bot.services.api_client import api_client
+from bot.keyboards.inline import profile_keyboard
 
 router = Router()
 
 
-@router.message(Command("profile"))
-async def profile_command_handler(message: types.Message):
-    """Команда /profile для просмотра профиля пользователя"""
-    user_id = message.from_user.id
+@router.callback_query(lambda c: c.data == "menu_profile")
+async def profile_menu_callback(callback: types.CallbackQuery):
+    """Обработка нажатия кнопки 'Профиль'"""
+    await send_profile_info(callback.message, callback.from_user.id)
+    await callback.answer()
 
-    await message.answer("⏳ Загружаем информацию о вашем профиле...")
 
+@router.callback_query(lambda c: c.data == "profile_refresh")
+async def refresh_profile_callback(callback: types.CallbackQuery):
+    """Обновление информации профиля"""
+    await callback.message.edit_text("🔄 Обновляем данные профиля...")
+    await send_profile_info(callback.message, callback.from_user.id)
+    await callback.answer()
+
+
+async def send_profile_info(message: types.Message, user_id: int):
+    """Функция отправки информации о профиле"""
     try:
         response = await api_client._make_request("GET", f"{api_client.BASE_API_URL}/user/profile")
         
@@ -32,9 +42,9 @@ async def profile_command_handler(message: types.Message):
                 f"🖼 Осталось генераций: {remaining_generations}"
             )
 
-            await message.answer(profile_text, parse_mode="Markdown")
+            await message.edit_text(profile_text, parse_mode="Markdown", reply_markup=profile_keyboard())
         else:
-            await message.answer("❌ Ошибка при получении профиля.")
+            await message.edit_text("❌ Ошибка при получении профиля.")
     
     except Exception as e:
-        await message.answer(f"❌ Ошибка: {e}")
+        await message.edit_text(f"❌ Ошибка: {e}")

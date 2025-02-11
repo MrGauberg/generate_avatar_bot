@@ -1,0 +1,2 @@
+start: 
+	python -m bot.main

@@ -33,7 +33,7 @@ dp.include_router(payments.router)
 dp.include_router(profile.router)
 dp.include_router(support.router)
 dp.include_router(generation.router) 
-dp.message.middleware(ThrottleMiddleware(rate_limit=1.5))  # Подключаем антифлуд
+dp.message.middleware(ThrottleMiddleware(rate_limit=0.3))  # Подключаем антифлуд
 
 
 logger.info("Запуск бота...")
@@ -42,13 +42,13 @@ async def on_startup():
     """Действия при запуске бота"""
     try:
         logging.info("Authenticating bot with API...")
-        # Авторизация через API (при необходимости)
-        # email = "user@example.com"
-        # password = "securepassword"
-        # await api_client.authenticate(email, password)
+        email = Settings.user.email
+        password = Settings.user.password
+        await api_client.authenticate(email, password)
         logging.info("Bot successfully authenticated!")
     except Exception as e:
         logging.error(f"Authentication failed: {e}")
+        raise e
 
     logging.info("Bot started successfully!")
 
