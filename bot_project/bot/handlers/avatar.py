@@ -8,7 +8,6 @@ import tempfile
 import os
 import logging
 import aiofiles
-from asgiref.sync import sync_to_async
 
 router = Router()
 
@@ -63,39 +62,44 @@ async def handle_gender_choice(callback: types.CallbackQuery, bot: Bot):
     await callback.message.edit_text("📤 Отправляем фото на сервер, подождите...")
 
     # Подготовка файлов для загрузки
-    temp_files = []  # Список временных файлов
-    file_tuples = []  # Файлы в формате, ожидаемом API
+    files = []
+    temp_files = []  # Список для хранения путей временных файлов
 
     try:
         for i, photo_id in enumerate(user_photos[user_id]):
             temp_file_path = os.path.join(tempfile.gettempdir(), f"photo_{i}.jpg")
 
-            # Скачиваем фото
+            # Скачиваем фото В ФАЙЛ, а не в поток
             await bot.download(photo_id, destination=temp_file_path)
+
             temp_files.append(temp_file_path)
 
-            # Читаем файл асинхронно перед отправкой
-            async with aiofiles.open(temp_file_path, 'rb') as file:
-                file_content = await file.read()
-                file_name = os.path.basename(temp_file_path)
-                file_tuples.append(('images', (file_name, file_content, 'image/jpeg')))
+            # Читаем содержимое и добавляем в список файлов для API
+            async with aiofiles.open(temp_file_path, "rb") as temp_file:
+                file_data = await temp_file.read()
+                if file_data:
+                    files.append(("images", (f"photo_{i}.jpg", file_data, "image/jpeg")))
+
+        print("Файлы, отправляемые в API:", len(files))
 
         # Отправляем файлы в API
-        response = await api_client.upload_avatar(files=file_tuples, gender=gender)
-
-        # Удаляем временные файлы после загрузки
-        for temp_file in temp_files:
-            await sync_to_async(os.remove)(temp_file)
-
+        response = await api_client.upload_avatar(files=files, gender=gender)
         avatar_id = response.get("avatar_id")
+
         if avatar_id:
             await callback.message.edit_text(f"🎉 Аватар создан! ID: {avatar_id}")
         else:
             await callback.message.edit_text("❌ Ошибка при создании аватара.")
-
     except Exception as e:
         logging.error(f"Ошибка загрузки аватара: {e}")
         await callback.message.edit_text(f"❌ Ошибка: {e}")
+    finally:
+        # Удаляем временные файлы
+        for temp_file_path in temp_files:
+            try:
+                os.remove(temp_file_path)
+            except Exception as e:
+                logging.warning(f"Не удалось удалить файл {temp_file_path}: {e}")
 
     # Очищаем временные данные
     del user_photos[user_id]
