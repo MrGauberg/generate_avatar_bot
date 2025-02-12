@@ -33,6 +33,7 @@ class AvatarUploadView(APIView):
         print("files_len", len(files))
         print("settings.AVATAR_IMAGES_COUNT ", settings.AVATAR_IMAGES_COUNT)
         print(len(files), settings.AVATAR_IMAGES_COUNT)
+        print(type(len(files)), type(settings.AVATAR_IMAGES_COUNT))
         print(len(files) != settings.AVATAR_IMAGES_COUNT)
 
         if len(files) != settings.AVATAR_IMAGES_COUNT:
