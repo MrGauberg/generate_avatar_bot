@@ -35,12 +35,12 @@ class AvatarUploadSerializer(serializers.Serializer):
 
     images = serializers.ListField(
         child=serializers.ImageField(),
-        # min_length=settings.AVATAR_IMAGES_COUNT,
-        # max_length=settings.AVATAR_IMAGES_COUNT,
-        # error_messages={
-        #     "min_length": f"Должно быть ровно {settings.AVATAR_IMAGES_COUNT} изображений",
-        #     "max_length": f"Должно быть ровно {settings.AVATAR_IMAGES_COUNT} изображений",
-        # },
+        min_length=settings.AVATAR_IMAGES_COUNT,
+        max_length=settings.AVATAR_IMAGES_COUNT,
+        error_messages={
+            "min_length": f"Должно быть ровно {settings.AVATAR_IMAGES_COUNT} изображений",
+            "max_length": f"Должно быть ровно {settings.AVATAR_IMAGES_COUNT} изображений",
+        },
     )
     gender = serializers.ChoiceField(
         choices=["male", "female", "child"], default="male"

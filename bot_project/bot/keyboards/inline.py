@@ -104,3 +104,12 @@ def support_keyboard():
         [InlineKeyboardButton(text="📞 Связаться с поддержкой", url=f"https://t.me/{SUPPORT_USERNAME}")]
     ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+
+def start_keyboard():
+    """Клавиатура для выбора перед началом"""
+    buttons = [
+        [InlineKeyboardButton(text="🛒 Купить", callback_data="start_buy")],
+        [InlineKeyboardButton(text="ℹ Инструкция", callback_data="start_instruction")]
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=buttons)

@@ -55,6 +55,10 @@ class APIEndpoints:
     @property
     def disable_god_mode(self):
         return f"{self.BASE_API_URL}/god-mode/disable/"
+    
+    @property
+    def get_user_profile(self):
+        return f"{self.BASE_API_URL}/api/user/profile/"
 
 
 class APIClient(APIEndpoints):
@@ -179,7 +183,12 @@ class APIClient(APIEndpoints):
     async def disable_god_mode(self) -> Any:
         """Выключение режима Бога"""
         return await self._make_request("POST", self.disable_god_mode)
+    
+    async def get_user_profile(self, user_id) -> Any:
+        """Получение профиля пользователя"""
+        return await self._make_request("GET", self.get_user_profile)
 
+        
 
 # Экземпляр клиента
 api_client = APIClient()

@@ -2,7 +2,7 @@
 
 from aiogram import Router, types
 from aiogram.filters import Command
-from bot.keyboards.inline import main_menu_keyboard
+from bot.keyboards.inline import main_menu_keyboard, start_keyboard
 from bot.handlers.avatar import avatar_callback_handler
 from bot.handlers.generation import generate_menu_callback
 from bot.handlers.god_mode import god_mode_menu_callback
@@ -10,6 +10,8 @@ from bot.handlers.settings import settings_menu_callback
 from bot.handlers.support import support_callback_handler
 from bot.handlers.profile import profile_menu_callback
 from bot.handlers.payments import buy_menu_callback
+import logging
+from bot.services.api_client import api_client
 
 router = Router()
 
@@ -73,3 +75,27 @@ async def buy_button_handler(callback: types.CallbackQuery):
     """Обработка кнопки 'Купить генерации'"""
     await buy_menu_callback(callback)
     await callback.answer()
+
+
+@router.message(Command("start"))
+async def start_handler(message: types.Message):
+    """Обработчик команды /start. Проверяет авторизацию."""
+    user_id = message.from_user.id
+
+    try:
+        # Проверяем авторизацию пользователя
+        user_data = await api_client.get_user_profile(user_id)
+        if user_data.get("telegram_id") == user_id:
+            # Пользователь авторизован → показываем главное меню
+            await message.answer("👋 Добро пожаловать!", reply_markup=main_menu_keyboard())
+            return
+
+    except Exception as e:
+        logging.error(f"Ошибка при проверке авторизации: {e}")
+
+    await message.answer(
+        "❗ Вы не авторизованы. Чтобы начать, выберите:\n\n"
+        "🛒 **Купить** — оплатить генерации и создать аватар\n"
+        "ℹ **Инструкция** — узнать, как работает бот",
+        reply_markup=start_keyboard()
+    )

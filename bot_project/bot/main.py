@@ -2,7 +2,7 @@
 
 import asyncio
 import logging
-from aiogram import Bot, Dispatcher
+from aiogram import Bot, Dispatcher, types
 from bot.config import Settings
 from bot.services.api_client import api_client
 from bot.handlers import start
@@ -36,6 +36,13 @@ dp.include_router(generation.router)
 dp.message.middleware(ThrottleMiddleware(rate_limit=0.3))  # Подключаем антифлуд
 
 
+async def set_menu():
+    await bot.send_message('592375841', text="Бот запущен!")
+    await bot.set_my_commands([
+        types.BotCommand(command="/start", description="Знакомство с ботом"),
+    ])
+
+
 logger.info("Запуск бота...")
 
 async def on_startup():
@@ -56,6 +63,7 @@ async def on_startup():
 async def main():
     """Главная асинхронная функция запуска бота"""
     await on_startup()
+    await set_menu()
     
     try:
         await dp.start_polling(bot)

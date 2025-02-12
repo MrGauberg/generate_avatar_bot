@@ -44,7 +44,7 @@ services:
   celery:
     build:
       context: ./backend/
-    # entrypoint: sh entrypoint.sh
+    entrypoint: sh entrypoint.sh
     env_file: .env
     command: celery -A core worker --loglevel=info
     volumes:
@@ -60,7 +60,7 @@ services:
   celery_beat:
     build:
       context: ./backend/
-    # entrypoint: sh entrypoint.sh
+    entrypoint: sh entrypoint.sh
     env_file: .env
     command: celery -A core beat --loglevel=info
     volumes:
