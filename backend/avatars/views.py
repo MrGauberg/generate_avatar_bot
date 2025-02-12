@@ -29,7 +29,6 @@ class AvatarUploadView(APIView):
         files = request.FILES.getlist("images")
         gender = request.data.get("gender", "male")
         
-        print("files ", files)
         print("files_len", len(files))
         print("settings.AVATAR_IMAGES_COUNT ", settings.AVATAR_IMAGES_COUNT)
         print(len(files), settings.AVATAR_IMAGES_COUNT)

@@ -127,7 +127,7 @@ SIMPLE_JWT = {
 LEONARDO_API_KEY = os.getenv("LEONARDO_API_KEY")
 
 # Сколько файлов потребуеттся загрузить для создания аватара
-AVATAR_IMAGES_COUNT = os.getenv("AVATAR_IMAGES_COUNT", 10)
+AVATAR_IMAGES_COUNT = int(os.getenv("AVATAR_IMAGES_COUNT", 10))
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
