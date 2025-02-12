@@ -32,8 +32,8 @@ class AvatarUploadView(APIView):
         print("files ", files)
         print("files_len", len(files))
 
-        # if len(files) != settings.AVATAR_IMAGES_COUNT:
-        #     return Response({"error": f"Должно быть ровно {settings.AVATAR_IMAGES_COUNT} изображений"}, status=status.HTTP_400_BAD_REQUEST)
+        if len(files) != settings.AVATAR_IMAGES_COUNT:
+            return Response({"error": f"Должно быть ровно {settings.AVATAR_IMAGES_COUNT} изображений"}, status=status.HTTP_400_BAD_REQUEST)
 
         # Создаем аватар и сохраняем изображения
         avatar_response = LeonardoService.create_avatar(user, gender, files)
