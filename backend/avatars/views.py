@@ -31,7 +31,9 @@ class AvatarUploadView(APIView):
         
         print("files ", files)
         print("files_len", len(files))
-        print("settings.AVATAR_IMAGES_COUNT ", settings.AVATAR_IMAGES_COUNT)   
+        print("settings.AVATAR_IMAGES_COUNT ", settings.AVATAR_IMAGES_COUNT)
+        print(len(files), settings.AVATAR_IMAGES_COUNT)
+        print(len(files) != settings.AVATAR_IMAGES_COUNT)
 
         if len(files) != settings.AVATAR_IMAGES_COUNT:
             return Response({"error": f"Должно быть ровно {settings.AVATAR_IMAGES_COUNT} изображений"}, status=status.HTTP_400_BAD_REQUEST)
