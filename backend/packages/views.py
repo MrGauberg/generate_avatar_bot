@@ -50,7 +50,7 @@ class CreatePaymentView(APIView):
 
         payment_id = str(uuid.uuid4())
 
-        user = User.objects.create(telegram_id=telegram_id, email=email)
+        user = User.objects.create(telegram_id=telegram_id, email=email, username=email)
 
         payment_data = {
             "amount": {"value": str(amount), "currency": "RUB"},
