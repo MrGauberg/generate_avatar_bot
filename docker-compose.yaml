@@ -2,6 +2,7 @@ volumes:
   pg_data:
   static:
   media:
+  redis_data:
 
 services:
   db:
@@ -40,11 +41,15 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --save 60 1 --loglevel warning
+
 
   celery:
     build:
       context: ./backend/
-    entrypoint: sh entrypoint.sh
+    # entrypoint: sh entrypoint.sh
     env_file: .env
     command: celery -A core worker --loglevel=info
     volumes:
@@ -60,7 +65,7 @@ services:
   celery_beat:
     build:
       context: ./backend/
-    entrypoint: sh entrypoint.sh
+    # entrypoint: sh entrypoint.sh
     env_file: .env
     command: celery -A core beat --loglevel=info
     volumes:
