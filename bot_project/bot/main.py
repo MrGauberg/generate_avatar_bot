@@ -17,7 +17,7 @@ from bot.handlers import generation
 from bot.utils.logger import logger
 from bot.middlewares.throttle import ThrottleMiddleware
 from bot.handlers import instruction
-from bot_project.bot.handlers import ukassa
+from bot.handlers import ukassa
 
 # Настраиваем логирование
 logging.basicConfig(level=logging.INFO)

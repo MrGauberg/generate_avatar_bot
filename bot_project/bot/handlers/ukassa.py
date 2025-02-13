@@ -79,7 +79,7 @@ async def create_payment(callback: types.CallbackQuery, state: FSMContext):
     try:
         # Отправляем запрос в API ЮKassa
         tg_user_id = callback.from_user.id
-        response = await api_client.create_payment(user_id=tg_user_id, package_type_id=package_type_id)
+        response = await api_client.create_payment(user_id=tg_user_id, email=email, package_type_id=package_type_id)
         payment_url = response.get("payment_url")
 
         if payment_url:

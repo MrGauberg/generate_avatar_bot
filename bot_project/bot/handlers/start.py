@@ -24,7 +24,7 @@ async def start_handler(message: types.Message):
     try:
         # Проверяем авторизацию пользователя
         user_data = await api_client.get_user_profile(user_id)
-        if user_data.get("telegram_id") == user_id:
+        if user_data.get("is_authorized"):
             # Пользователь авторизован → показываем главное меню
             await message.answer("👋 Добро пожаловать!", reply_markup=main_menu_keyboard())
             return

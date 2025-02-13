@@ -6,8 +6,8 @@ from users.user_manager import CustomUserManager
 
 class CustomUser(AbstractUser):
     telegram_id = models.CharField(max_length=50, blank=True, null=True)
-    
     email = models.EmailField(unique=True)
+    is_authorized = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []

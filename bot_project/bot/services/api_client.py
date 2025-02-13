@@ -135,10 +135,10 @@ class APIClient:
         url = f"{self.base_api_url}/users/{user_id}"
         return await self._make_request("GET", url)
 
-    async def create_payment(self, user_id: str, package_type_id: int) -> dict:
+    async def create_payment(self, user_id: str, email: str, package_type_id: int) -> dict:
         """Создание платежа через ЮKassa"""
         url = f"{self.base_api_url}/packages/yookassa-payment/create/"
-        data = {"user_id": user_id, "package_type_id": package_type_id}
+        data = {"user_id": user_id, "package_type_id": package_type_id, "email": email}
         return await self._make_request("POST", url, data)
 
     async def get_package_types(self) -> list:
