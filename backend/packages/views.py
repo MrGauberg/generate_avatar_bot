@@ -51,7 +51,10 @@ class CreatePaymentView(APIView):
         payment_id = str(uuid.uuid4())
 
         try:
-            user = User.objects.create(telegram_id=telegram_id, email=email, username=email)
+            user, created = User.objects.get_or_create(
+                telegram_id=telegram_id,
+                defaults={"email": email, "username": email}  # Генерация уникального username
+            )
             package = Package.objects.create(
                     user=user,
                     package_type=package_type,
