@@ -1,7 +1,7 @@
 set -e  # Прерывать выполнение при ошибке
 
 echo "Checking for model changes..."
-python3 manage.py makemigrations
+python3 manage.py makemigrations --noinput
 
 echo "Applying migrations..."
 python3 manage.py migrate

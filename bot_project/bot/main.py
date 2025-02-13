@@ -16,6 +16,8 @@ from bot.handlers import support
 from bot.handlers import generation
 from bot.utils.logger import logger
 from bot.middlewares.throttle import ThrottleMiddleware
+from bot.handlers import instruction
+from bot_project.bot.handlers import ukassa
 
 # Настраиваем логирование
 logging.basicConfig(level=logging.INFO)
@@ -33,6 +35,8 @@ dp.include_router(payments.router)
 dp.include_router(profile.router)
 dp.include_router(support.router)
 dp.include_router(generation.router) 
+dp.include_router(instruction.router)
+dp.include_router(ukassa.router)
 dp.message.middleware(ThrottleMiddleware(rate_limit=0.3))  # Подключаем антифлуд
 
 

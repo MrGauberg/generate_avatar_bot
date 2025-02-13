@@ -5,69 +5,14 @@ from bot.config import Settings
 from typing import Dict, Any, List, Tuple
 
 
-class APIEndpoints:
-    """Класс с API-эндпоинтами"""
-
-    BASE_API_URL = Settings.bot.API_URL
-
-    # Авторизация
-    @property
-    def auth_login(self):
-        return f"{self.BASE_API_URL}/api/users/token/"
-
-    @property
-    def auth_refresh(self):
-        return f"{self.BASE_API_URL}/api/users/token/refresh/"
-
-    # Аватары
-    @property
-    def create_avatar(self):
-        return f"{self.BASE_API_URL}/api/avatars/upload/"
-
-    @property
-    def get_avatars(self):
-        return f"{self.BASE_API_URL}/avatars/"
-
-    # Стили и категории
-    @property
-    def get_styles(self):
-        return f"{self.BASE_API_URL}/styles/"
-
-    @property
-    def get_categories(self):
-        return f"{self.BASE_API_URL}/categories/"
-
-    # Генерация изображений
-    @property
-    def generate_image(self):
-        return f"{self.BASE_API_URL}/generations/"
-
-    # Покупка пакетов генераций
-    @property
-    def purchase_package(self):
-        return f"{self.BASE_API_URL}/orders/"
-
-    # Режим Бога
-    @property
-    def enable_god_mode(self):
-        return f"{self.BASE_API_URL}/god-mode/enable/"
-
-    @property
-    def disable_god_mode(self):
-        return f"{self.BASE_API_URL}/god-mode/disable/"
-    
-    @property
-    def get_user_profile(self):
-        return f"{self.BASE_API_URL}/api/user/profile/"
-
-
-class APIClient(APIEndpoints):
+class APIClient:
     """Клиент API для взаимодействия с сервером"""
 
     def __init__(self) -> None:
         self.client = httpx.AsyncClient(follow_redirects=True)
         self.access_token = None
         self.refresh_token = None
+        self.base_api_url = f"{Settings.bot.API_URL}/api"
 
     async def close(self) -> None:
         if not self.client.is_closed:
@@ -75,10 +20,9 @@ class APIClient(APIEndpoints):
 
     async def authenticate(self, email: str, password: str) -> None:
         """Авторизация и получение токенов"""
+        url = f"{self.base_api_url}/users/token/"
         try:
-            response = await self.client.post(
-                self.auth_login, json={"email": email, "password": password}
-            )
+            response = await self.client.post(url, json={"email": email, "password": password})
             response.raise_for_status()
             tokens = response.json()
             self.access_token = tokens.get("access")
@@ -90,10 +34,9 @@ class APIClient(APIEndpoints):
 
     async def refresh_access_token(self) -> None:
         """Обновление access-токена"""
+        url = f"{self.base_api_url}/users/token/refresh/"
         try:
-            response = await self.client.post(
-                self.auth_refresh, json={"refresh": self.refresh_token}
-            )
+            response = await self.client.post(url, json={"refresh": self.refresh_token})
             response.raise_for_status()
             tokens = response.json()
             self.access_token = tokens.get("access")
@@ -120,7 +63,6 @@ class APIClient(APIEndpoints):
             else:
                 response = await self.client.request(method, url, json=data, headers=headers)
 
-            # response.raise_for_status()
             print(response.json())
             return response.json()
 
@@ -128,19 +70,16 @@ class APIClient(APIEndpoints):
             if e.response.status_code == 401:  # Ошибка авторизации
                 print("Access token expired. Attempting to refresh token.")
                 try:
-                    await self.refresh_access_token()  # Попробовать обновить токен
+                    await self.refresh_access_token()
                     headers["Authorization"] = f"Bearer {self.access_token}"
                     response = await self.client.request(method, url, json=data, headers=headers)
                     response.raise_for_status()
                     return response.json()
                 except httpx.HTTPStatusError as refresh_error:
-                    if refresh_error.response.status_code == 401:  # Refresh тоже недействителен
+                    if refresh_error.response.status_code == 401:
                         print("Refresh token expired. Re-authenticating.")
-                        await self.authenticate()  # Полная авторизация
-                        headers["Authorization"] = f"Bearer {self.access_token}"
-                        response = await self.client.request(method, url, json=data, headers=headers)
-                        response.raise_for_status()
-                        return response.json()
+                        # Здесь можно реализовать повторную авторизацию, если необходимо
+                        raise Exception("Both tokens expired. Please log in again.")
                     else:
                         raise refresh_error
             else:
@@ -150,45 +89,63 @@ class APIClient(APIEndpoints):
 
     async def upload_avatar(self, files: List[Tuple[str, Tuple[str, bytes, str]]], gender: str) -> Any:
         """Загрузка аватара"""
-        return await self._make_request("POST", self.create_avatar, {"gender": gender}, files
-        )
-
+        url = f"{self.base_api_url}/avatars/upload/"
+        data = {"gender": gender}
+        return await self._make_request("POST", url, data, files)
 
     async def get_user_avatars(self) -> Any:
         """Получение списка аватаров"""
-        return await self._make_request("GET", self.get_avatars)
+        url = f"{self.base_api_url}/avatars/"
+        return await self._make_request("GET", url)
 
     async def get_styles_list(self) -> Any:
         """Получение списка стилей"""
-        return await self._make_request("GET", self.get_styles)
+        url = f"{self.base_api_url}/styles/"
+        return await self._make_request("GET", url)
 
     async def get_categories_list(self) -> Any:
         """Получение списка категорий"""
-        return await self._make_request("GET", self.get_categories)
+        url = f"{self.base_api_url}/categories/"
+        return await self._make_request("GET", url)
 
     async def generate_user_image(self, prompt: str, model_id: int) -> Any:
         """Генерация изображения"""
+        url = f"{self.base_api_url}/generations/"
         data = {"prompt": prompt, "model_id": model_id}
-        return await self._make_request("POST", self.generate_image, data)
+        return await self._make_request("POST", url, data)
 
     async def purchase_generation_package(self, package_id: int) -> Any:
         """Покупка пакета генераций"""
+        url = f"{self.base_api_url}/packages/yookassa-payment/create/"
         data = {"package_id": package_id}
-        return await self._make_request("POST", self.purchase_package, data)
+        return await self._make_request("POST", url, data)
 
     async def enable_god_mode(self) -> Any:
         """Включение режима Бога"""
-        return await self._make_request("POST", self.enable_god_mode)
+        url = f"{self.base_api_url}/god-mode/enable/"
+        return await self._make_request("POST", url)
 
     async def disable_god_mode(self) -> Any:
         """Выключение режима Бога"""
-        return await self._make_request("POST", self.disable_god_mode)
-    
-    async def get_user_profile(self, user_id) -> Any:
-        """Получение профиля пользователя"""
-        return await self._make_request("GET", self.get_user_profile)
+        url = f"{self.base_api_url}/god-mode/disable/"
+        return await self._make_request("POST", url)
 
-        
+    async def get_user_profile(self, user_id: str) -> Any:
+        """Получение профиля пользователя"""
+        url = f"{self.base_api_url}/users/{user_id}"
+        return await self._make_request("GET", url)
+
+    async def create_payment(self, user_id: str, package_type_id: int) -> dict:
+        """Создание платежа через ЮKassa"""
+        url = f"{self.base_api_url}/packages/yookassa-payment/create/"
+        data = {"user_id": user_id, "package_type_id": package_type_id}
+        return await self._make_request("POST", url, data)
+
+    async def get_package_types(self) -> list:
+        """Получение списка типов пакетов генераций"""
+        url = f"{self.base_api_url}/packages/package-types/"
+        return await self._make_request("GET", url)
+
 
 # Экземпляр клиента
 api_client = APIClient()

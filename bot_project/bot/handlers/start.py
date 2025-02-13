@@ -18,13 +18,26 @@ router = Router()
 
 @router.message(Command("start"))
 async def start_handler(message: types.Message):
-    """Обработчик команды /start"""
-    welcome_text = (
-        "👋 Привет! Я бот, который поможет тебе создать аватар и генерировать изображения.\n\n"
-        "👇 Выбери, что хочешь сделать:"
-    )
+    """Обработчик команды /start. Проверяет авторизацию."""
+    user_id = message.from_user.id
 
-    await message.answer(welcome_text, reply_markup=main_menu_keyboard())
+    try:
+        # Проверяем авторизацию пользователя
+        user_data = await api_client.get_user_profile(user_id)
+        if user_data.get("telegram_id") == user_id:
+            # Пользователь авторизован → показываем главное меню
+            await message.answer("👋 Добро пожаловать!", reply_markup=main_menu_keyboard())
+            return
+
+    except Exception as e:
+        logging.error(f"Ошибка при проверке авторизации: {e}")
+
+    await message.answer(
+        "❗ Вы не авторизованы. Чтобы начать, выберите:\n\n"
+        "🛒 **Купить** — оплатить генерации и создать аватар\n"
+        "ℹ **Инструкция** — узнать, как работает бот",
+        reply_markup=start_keyboard()
+    )
 
 
 # 🔄 Обработчики inline-кнопок
@@ -77,25 +90,3 @@ async def buy_button_handler(callback: types.CallbackQuery):
     await callback.answer()
 
 
-@router.message(Command("start"))
-async def start_handler(message: types.Message):
-    """Обработчик команды /start. Проверяет авторизацию."""
-    user_id = message.from_user.id
-
-    try:
-        # Проверяем авторизацию пользователя
-        user_data = await api_client.get_user_profile(user_id)
-        if user_data.get("telegram_id") == user_id:
-            # Пользователь авторизован → показываем главное меню
-            await message.answer("👋 Добро пожаловать!", reply_markup=main_menu_keyboard())
-            return
-
-    except Exception as e:
-        logging.error(f"Ошибка при проверке авторизации: {e}")
-
-    await message.answer(
-        "❗ Вы не авторизованы. Чтобы начать, выберите:\n\n"
-        "🛒 **Купить** — оплатить генерации и создать аватар\n"
-        "ℹ **Инструкция** — узнать, как работает бот",
-        reply_markup=start_keyboard()
-    )
