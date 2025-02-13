@@ -9,6 +9,13 @@ class PackageType(models.Model):
     total_generations = models.IntegerField()
     amount = models.DecimalField(max_digits=10, decimal_places=2)
 
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        verbose_name = 'Тип пакета'
+        verbose_name_plural = 'Типы пакетов'
+
 class Package(models.Model):
     PACKAGE_TYPES = (
         ('basic', 'Базовый'),
@@ -26,6 +33,10 @@ class Package(models.Model):
 
     def __str__(self):
         return f'{self.package_type} пакет для {self.user.username}'
+    
+    class Meta:
+        verbose_name = 'Пакет'
+        verbose_name_plural = 'Пакеты'
 
 
 class Payment(models.Model):
@@ -45,3 +56,7 @@ class Payment(models.Model):
 
     def __str__(self):
         return f"Платеж {self.payment_id} - {self.status}"
+    
+    class Meta:
+        verbose_name = 'Платеж Юкасса'
+        verbose_name_plural = 'Платежи Юкасса'

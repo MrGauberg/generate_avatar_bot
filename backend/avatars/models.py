@@ -17,6 +17,10 @@ class Avatar(models.Model):
 
     def __str__(self):
         return f"Avatar ({self.gender}) for {self.user.username}"
+    
+    class Meta:
+        verbose_name = 'Аватар'
+        verbose_name_plural = 'Аватары'
 
 
 class AvatarImage(models.Model):
@@ -26,3 +30,7 @@ class AvatarImage(models.Model):
 
     def __str__(self):
         return f"Image for Avatar {self.avatar.id}"
+    
+    class Meta:
+        verbose_name = 'Изображение аватара'
+        verbose_name_plural = 'Изображения аватаров'

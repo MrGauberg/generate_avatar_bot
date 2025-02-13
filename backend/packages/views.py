@@ -2,6 +2,8 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 
+from backend.core.tele_bot import tele_bot
+
 from .serializers import PackageSerializer, PackageTypeSerializer
 import uuid
 from django.conf import settings
@@ -77,6 +79,14 @@ class CreatePaymentView(APIView):
                 amount=amount,
                 status="pending"
             )
+
+            # TODO: Временная затычка пока не работает Юкасса. Стразу делаю пользователя авторизованным и активирую упленный пакет и отправляю сообщение пользователю
+            user.is_authorized = True  # Помечаем пользователя как авторизованного
+            package.is_active = True  # Помечаем пакет как активный
+            user.save()
+            package.save()
+
+            tele_bot.send_message(telegram_id, "✅ Оплата прошла успешно!")
 
             return Response({"payment_url": payment.confirmation.confirmation_url}, status=status.HTTP_201_CREATED)
 

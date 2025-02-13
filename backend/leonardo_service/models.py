@@ -13,3 +13,7 @@ class LeonardoGeneration(models.Model):
 
     def __str__(self):
         return f"Generation {self.generation_id} ({self.status}) for {self.user.username}"
+    
+    class Meta:
+        verbose_name = 'Генерация'
+        verbose_name_plural = 'Генерации'

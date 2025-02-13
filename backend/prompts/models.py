@@ -6,6 +6,10 @@ class PromptCategory(models.Model):
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        verbose_name = 'Категория промпта'
+        verbose_name_plural = 'Категории промптов'
 
 class PromptStyle(models.Model):
     name = models.CharField(max_length=100)
@@ -13,3 +17,7 @@ class PromptStyle(models.Model):
 
     def __str__(self):
         return f'{self.name} ({self.category.name})'
+    
+    class Meta:
+        verbose_name = 'Стиль промпта'
+        verbose_name_plural = 'Стили промптов'

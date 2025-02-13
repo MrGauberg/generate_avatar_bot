@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram import Router, types
 from bot.services.api_client import api_client
-from bot.keyboards.inline import InlineKeyboardMarkup, InlineKeyboardButton
+from bot.keyboards.inline import InlineKeyboardMarkup, InlineKeyboardButton, pay_keyboard
 import logging
 
 router = Router()
@@ -84,9 +84,10 @@ async def create_payment(callback: types.CallbackQuery, state: FSMContext):
 
         if payment_url:
             await callback.message.edit_text(
-                f"✅ Оплата создана!\n\nПерейдите по ссылке для оплаты: [Оплатить]({payment_url})",
+                f"✅ Нажмите для оплаты, 👇",
                 parse_mode="Markdown",
-                disable_web_page_preview=True
+                disable_web_page_preview=True,
+                reply_markup=pay_keyboard(payment_url)
             )
         else:
             await callback.message.edit_text("❌ Ошибка при создании платежа.")

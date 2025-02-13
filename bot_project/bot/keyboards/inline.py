@@ -113,3 +113,9 @@ def start_keyboard():
         [InlineKeyboardButton(text="ℹ Инструкция", callback_data="start_instruction")]
     ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+
+def pay_keyboard(payment_url):
+    """Клавиатура для оплаты"""
+    button = InlineKeyboardButton(text="💳 Оплатить", url=payment_url)
+    return InlineKeyboardMarkup(inline_keyboard=[[button]])

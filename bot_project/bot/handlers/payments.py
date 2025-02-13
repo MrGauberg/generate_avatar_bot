@@ -2,7 +2,7 @@
 
 from aiogram import Router, types
 from bot.services.api_client import api_client
-from bot.keyboards.inline import get_payment_keyboard
+from bot.keyboards.inline import get_payment_keyboard, pay_keyboard
 
 router = Router()
 
@@ -26,10 +26,9 @@ async def handle_payment_callback(callback: types.CallbackQuery):
         payment_url = response.get("payment_url")
 
         if payment_url:
-            await callback.message.edit_text(
-                f"✅ Оплата создана!\n\nПерейдите по ссылке для оплаты: [Оплатить]({payment_url})",
-                parse_mode="Markdown",
-                disable_web_page_preview=True
+            await callback.message.answer(
+                "💳 **Оплатить сейчас:**",
+                reply_markup=pay_keyboard(payment_url)
             )
         else:
             await callback.message.edit_text("❌ Ошибка при создании платежа.")
@@ -37,3 +36,4 @@ async def handle_payment_callback(callback: types.CallbackQuery):
         await callback.message.edit_text(f"❌ Ошибка: {e}")
 
     await callback.answer()
+
