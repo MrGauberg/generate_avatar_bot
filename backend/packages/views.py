@@ -50,21 +50,26 @@ class CreatePaymentView(APIView):
 
         payment_id = str(uuid.uuid4())
 
-        user = User.objects.create(telegram_id=telegram_id, email=email, username=email)
-
-        payment_data = {
-            "amount": {"value": str(amount), "currency": "RUB"},
-            "confirmation": {"type": "redirect", "return_url": "https://your-site.com/success"},
-            "capture": True,
-            "description": f"Покупка генераций {package_type.name}",
-            "metadata": {"payment_id": payment_id, "package_type_id": package_type_id, "user_id": user.id}
-        }
-
         try:
+            user = User.objects.create(telegram_id=telegram_id, email=email, username=email)
+            package = Package.objects.create(
+                    user=user,
+                    package_type=package_type,
+                    generations_remains=package_type.total_generations
+                )
+
+            payment_data = {
+                "amount": {"value": str(amount), "currency": "RUB"},
+                "confirmation": {"type": "redirect", "return_url": "https://your-site.com/success"},
+                "capture": True,
+                "description": f"Покупка генераций {package_type.name}",
+                "metadata": {"payment_id": payment_id, "package_id": package.id, "user_id": user.id}
+            }
+
             payment = Payment.create(payment_data)
             PaymentModel.objects.create(
                 user=user,
-                package_type=package_type,
+                package=package,
                 payment_id=payment_id,
                 amount=amount,
                 status="pending"
@@ -83,12 +88,12 @@ class PaymentWebhookView(APIView):
         event_data = request.data
         metadata = event_data.get("object", {}).get("metadata", {})
         payment_id = metadata.get("payment_id")
-        package_type_id = metadata.get("package_type_id")
+        package_id = metadata.get("package_id")
         status_update = event_data.get("object", {}).get("status")
 
         user_id = metadata.get("user_id", None)
 
-        if not payment_id or not status_update or not package_type_id or not user_id:
+        if not payment_id or not status_update or not package_id or not user_id:
             return Response({"error": "Invalid payload"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -97,15 +102,12 @@ class PaymentWebhookView(APIView):
             payment.save()
 
             if status_update == "succeeded":
-                package_type = get_object_or_404(PackageType, id=package_type_id)
                 user = get_object_or_404(User, id=user_id)
-                Package.objects.create(
-                    user=payment.user,
-                    package_type=package_type,
-                    generations_remains=package_type.total_generations
-                )
+                package = get_object_or_404(Package, id=package_id)
+                package.is_active = True
                 user.is_authorized = True
                 user.save()
+                package.save()
 
             return Response({"message": "Payment status updated"}, status=status.HTTP_200_OK)
 

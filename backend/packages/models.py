@@ -19,6 +19,7 @@ class Package(models.Model):
     package_type = models.ForeignKey(PackageType, on_delete=models.CASCADE)
     generations_remains = models.IntegerField(default=0)
     purchase_date = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=False)
 
     def remaining_generations(self):
         return self.total_generations - self.used_generations
