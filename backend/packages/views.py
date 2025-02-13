@@ -2,7 +2,7 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 
-from backend.core.tele_bot import tele_bot
+from core.tele_bot import tele_bot
 
 from .serializers import PackageSerializer, PackageTypeSerializer
 import uuid
