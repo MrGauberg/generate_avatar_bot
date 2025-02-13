@@ -33,10 +33,9 @@ services:
     volumes:
       - static:/staticfiles/
       - media:/media/
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - /etc/letsencrypt/live/avatar-service.ddns.net:/etc/letsencrypt/live/avatar-service.ddns.net:ro
-      - /etc/letsencrypt/archive/avatar-service.ddns.net:/etc/letsencrypt/archive/avatar-service.ddns.net:ro
-      - /etc/letsencrypt/privkey.pem:/etc/letsencrypt/privkey.pem:ro
+      - /root/generate_avatar_bot/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /root/generate_avatar_bot/certs:/etc/letsencrypt:ro
+
     depends_on:
       - backend
 
