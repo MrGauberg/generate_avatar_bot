@@ -68,7 +68,7 @@ class CreatePaymentView(APIView):
                 "confirmation": {"type": "redirect", "return_url": "https://your-site.com/success"},
                 "capture": True,
                 "description": f"Покупка генераций {package_type.name}",
-                "metadata": {"payment_id": payment_id, "package_id": package.id, "user_id": user.id}
+                "metadata": {"payment_id": payment_id, "package_id": package.id, "user_id": user.id, "telegram_id": telegram_id},
             }
 
             payment = Payment.create(payment_data)
@@ -79,15 +79,7 @@ class CreatePaymentView(APIView):
                 amount=amount,
                 status="pending"
             )
-
-            # TODO: Временная затычка пока не работает Юкасса. Стразу делаю пользователя авторизованным и активирую упленный пакет и отправляю сообщение пользователю
-            user.is_authorized = True  # Помечаем пользователя как авторизованного
-            package.is_active = True  # Помечаем пакет как активный
-            user.save()
-            package.save()
-
-            tele_bot.send_message(telegram_id, "✅ Оплата прошла успешно!")
-
+            
             return Response({"payment_url": payment.confirmation.confirmation_url}, status=status.HTTP_201_CREATED)
 
         except Exception as e:
@@ -102,6 +94,7 @@ class PaymentWebhookView(APIView):
         metadata = event_data.get("object", {}).get("metadata", {})
         payment_id = metadata.get("payment_id")
         package_id = metadata.get("package_id")
+        telegram_id = metadata.get("telegram_id")
         status_update = event_data.get("object", {}).get("status")
 
         print(event_data)
@@ -124,6 +117,7 @@ class PaymentWebhookView(APIView):
                 user.save()
                 package.save()
 
+            tele_bot.send_message(telegram_id, "✅ Оплата прошла успешно!")
             return Response({"message": "Payment status updated"}, status=status.HTTP_200_OK)
 
         except PaymentModel.DoesNotExist:
