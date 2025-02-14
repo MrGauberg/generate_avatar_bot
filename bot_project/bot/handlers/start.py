@@ -9,7 +9,6 @@ from bot.handlers.god_mode import god_mode_menu_callback
 from bot.handlers.settings import settings_menu_callback
 from bot.handlers.support import support_callback_handler
 from bot.handlers.profile import profile_menu_callback
-from bot.handlers.ukassa import request_email
 
 from bot.utils.logger import logger
 from bot.services.api_client import api_client

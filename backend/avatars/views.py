@@ -17,6 +17,13 @@ class AvatarViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """Фильтруем аватары по текущему пользователю"""
         return self.queryset.filter(user=self.request.user)
+    
+    def partial_update(self, request, *args, **kwargs):
+
+        
+        return super().partial_update(request, *args, **kwargs)
+    
+
 
 
 class AvatarUploadView(APIView):

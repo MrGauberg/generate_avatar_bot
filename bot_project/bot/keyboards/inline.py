@@ -2,17 +2,6 @@
 
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-def main_menu_keyboard():
-    """Главное меню бота (inline-кнопки)"""
-    buttons = [
-        [InlineKeyboardButton(text="🖼 Создать аватар", callback_data="menu_create_avatar"),
-         InlineKeyboardButton(text="🎨 Генерация изображений", callback_data="menu_generate_images")],
-        [InlineKeyboardButton(text="🔮 Режим Бога", callback_data="menu_god_mode"),
-         InlineKeyboardButton(text="⚙ Настройки", callback_data="menu_settings")],
-        [InlineKeyboardButton(text="📞 Поддержка", callback_data="menu_support")]
-    ]
-    return InlineKeyboardMarkup(inline_keyboard=buttons)
-
 
 def gender_selection_keyboard():
     """Клавиатура выбора пола"""

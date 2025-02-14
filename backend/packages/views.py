@@ -30,7 +30,7 @@ class PackageViewSet(viewsets.ModelViewSet):
     serializer_class = PackageSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
+    def get_queryset(self,):
         return self.queryset.filter(user=self.request.user)
 
 

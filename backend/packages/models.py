@@ -5,7 +5,7 @@ from django.conf import settings
 
 
 class PackageType(models.Model):
-    name = models.CharField(max_length=20)
+    name = models.CharField(max_length=40)
     total_generations = models.IntegerField()
     amount = models.DecimalField(max_digits=10, decimal_places=2)
 
@@ -21,7 +21,7 @@ class Package(models.Model):
         ('basic', 'Базовый'),
         ('premium', 'Премиум'),
     )
-
+    name = models.CharField(max_length=40)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='packages')
     package_type = models.ForeignKey(PackageType, on_delete=models.CASCADE)
     generations_remains = models.IntegerField(default=0)

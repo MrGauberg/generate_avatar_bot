@@ -3,7 +3,7 @@ from .models import Avatar, AvatarImage
 
 @admin.register(Avatar)
 class AvatarAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'gender', 'created_at')
+    list_display = ('id', 'user', 'is_active', 'gender', 'created_at')
     search_fields = ('user__username', 'gender')
     list_filter = ('gender', 'created_at')
 

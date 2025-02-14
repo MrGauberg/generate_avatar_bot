@@ -14,6 +14,7 @@ class Avatar(models.Model):
     model_id = models.CharField(max_length=100, unique=True, blank=True, null=True)
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Avatar ({self.gender}) for {self.user.username}"

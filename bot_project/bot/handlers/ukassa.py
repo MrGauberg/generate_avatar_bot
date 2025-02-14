@@ -15,16 +15,6 @@ class PaymentState(StatesGroup):
     waiting_for_email = State()
 
 
-@router.callback_query(lambda c: c.data == "start_payment_email")
-async def request_email(callback: types.CallbackQuery, state: FSMContext):
-    """Запрос email перед оплатой"""
-    await callback.message.edit_text(
-        "📧 Введите ваш email для получения чека и подтверждения оплаты:"
-    )
-    await state.set_state(PaymentState.waiting_for_email)
-    await callback.answer()
-
-
 @router.message(PaymentState.waiting_for_email)
 async def process_email(message: types.Message, state: FSMContext):
     """Обрабатываем email пользователя"""

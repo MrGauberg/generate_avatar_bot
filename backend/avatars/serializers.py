@@ -27,6 +27,7 @@ class AvatarSerializer(serializers.ModelSerializer):
             "gender",
             "created_at",
             "images",
+            "is_active",
         ]
 
 
