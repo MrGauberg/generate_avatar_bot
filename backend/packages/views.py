@@ -104,6 +104,8 @@ class PaymentWebhookView(APIView):
         package_id = metadata.get("package_id")
         status_update = event_data.get("object", {}).get("status")
 
+        print(event_data)
+
         user_id = metadata.get("user_id", None)
 
         if not payment_id or not status_update or not package_id or not user_id:
