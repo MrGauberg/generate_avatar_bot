@@ -81,6 +81,9 @@ services:
     env_file: .env
     depends_on:
       - backend
+      - celery
+      - celery_beat
+      - redis
     volumes:
       - ./bot_project/:/app
     command: ["python", "-m", "bot.main"]
