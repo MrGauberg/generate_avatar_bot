@@ -45,7 +45,8 @@ services:
 
   celery:
     build:
-      context: ./backend/
+      context: .
+      dockerfile: backend/Dockerfile
     # entrypoint: sh entrypoint.sh
     env_file: .env
     command: celery -A core worker --loglevel=info
@@ -74,9 +75,11 @@ services:
       DJANGO_SETTINGS_MODULE: core.settings
       PYTHONPATH: /app
     restart: always
-    
+
   bot:
-    build: ./bot_project/
+    build:
+      context: .
+      dockerfile: bot_project/Dockerfile
     restart: always
     env_file: .env
     depends_on:
