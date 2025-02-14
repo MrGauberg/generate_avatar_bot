@@ -4,7 +4,7 @@
 from aiogram import Router, types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 import logging
-from bot.services import api_client
+from bot.services.api_client import api_client
 
 router = Router()
 
