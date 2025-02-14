@@ -11,10 +11,8 @@ services:
       - pg_data:/var/lib/postgresql/data
 
   backend:
-    build:
-      context: .
-      dockerfile: backend/Dockerfile
-    entrypoint: sh backend/entrypoint.sh
+    build: ./backend/
+    entrypoint: sh entrypoint.sh
     env_file: .env
     depends_on:
       - db
@@ -47,9 +45,8 @@ services:
 
   celery:
     build:
-      context: .
-      dockerfile: backend/Dockerfile
-    # entrypoint: sh backend/entrypoint.sh
+      context: ./backend/
+    # entrypoint: sh entrypoint.sh
     env_file: .env
     command: celery -A core worker --loglevel=info
     volumes:
@@ -64,9 +61,8 @@ services:
 
   celery_beat:
     build:
-      context: .
-      dockerfile: backend/Dockerfile
-    # entrypoint: sh backend/entrypoint.sh
+      context: ./backend/
+    # entrypoint: sh entrypoint.sh
     env_file: .env
     command: celery -A core beat --loglevel=info
     volumes:
@@ -78,11 +74,9 @@ services:
       DJANGO_SETTINGS_MODULE: core.settings
       PYTHONPATH: /app
     restart: always
-
+    
   bot:
-    build:
-      context: .
-      dockerfile: bot_project/Dockerfile
+    build: ./bot_project/
     restart: always
     env_file: .env
     depends_on:
