@@ -23,9 +23,9 @@ async def start_handler(message: types.Message):
 
     try:
         user_data = await api_client.get_user_profile(user_id)
-        print(user_data)
         logger.info(f"user_data {user_data}.")
         if user_data.get("is_authenticated"):
+            logger.info(f"User {user_id} is authenticated.")
             await message.answer(
                 "👋 Привет! Рад видеть тебя снова!\n\n"
                 "Выбери, что хочешь сделать сегодня: создать аватар, попробовать режим 'Бога' или просто поэкспериментировать с генерацией изображений!",
@@ -34,7 +34,7 @@ async def start_handler(message: types.Message):
             return
 
     except Exception as e:
-        logging.error(f"Ошибка при проверке авторизации: {e}")
+        logger.error(f"Ошибка при проверке авторизации: {e}")
 
     await message.answer(
         "👋 Привет! Добро пожаловать в нашего бота!\n\n"
