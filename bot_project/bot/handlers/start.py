@@ -24,6 +24,7 @@ async def start_handler(message: types.Message):
 
     try:
         user_data = await api_client.get_user_profile(user_id)
+        print(user_data)
         if user_data.get("is_authenticated"):
             await message.answer(
                 "👋 Привет! Рад видеть тебя снова!\n\n"
