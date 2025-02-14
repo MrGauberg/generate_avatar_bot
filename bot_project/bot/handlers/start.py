@@ -2,7 +2,7 @@
 
 from aiogram import Router, types
 from aiogram.filters import Command
-from bot.keyboards.inline import main_menu_keyboard, start_keyboard
+from bot.keyboards.inline import start_keyboard
 from bot.handlers.avatar import avatar_callback_handler
 from bot.handlers.generation import generate_menu_callback
 from bot.handlers.god_mode import god_mode_menu_callback
@@ -13,6 +13,7 @@ from bot.handlers.ukassa import request_email
 
 from bot.utils.logger import logger
 from bot.services.api_client import api_client
+from bot.keyboards.reply import main_menu_keyboard
 
 router = Router()
 
