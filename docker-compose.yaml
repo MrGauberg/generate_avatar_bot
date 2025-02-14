@@ -35,7 +35,6 @@ services:
       - media:/media/
       - /etc/letsencrypt:/etc/letsencrypt:ro
       - /root/generate_avatar_bot/nginx.conf:/etc/nginx/nginx.conf:ro
-      - /root/generate_avatar_bot/certs:/etc/letsencrypt:ro
 
     depends_on:
       - backend
