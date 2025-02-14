@@ -141,7 +141,6 @@ class APIClient:
         }
         return await self._make_request("POST", url, data)
 
-
     async def get_package_types(self) -> list:
         """Получение списка типов пакетов генераций"""
         url = f"{self.base_api_url}/packages/package-types/"

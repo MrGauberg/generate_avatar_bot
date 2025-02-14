@@ -4,6 +4,8 @@
 from aiogram import Router, types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
+from bot.services import api_client
+
 router = Router()
 
 
@@ -57,19 +59,35 @@ async def instruction_step_3(callback: types.CallbackQuery):
 
 @router.callback_query(lambda c: c.data == "instruction_prices")
 async def instruction_step_4(callback: types.CallbackQuery):
-    """Четвертый шаг инструкции - стоимость"""
-    await callback.message.edit_text(
-        "💰 **Стоимость пакетов**\n\n"
-        "📦 **Пробный** - 199₽ (10 генераций)\n"
-        "📦 **Старт** - 499₽ (15 генераций)\n"
-        "📦 **Стандарт** - 1999₽ (30 генераций)\n"
-        "📦 **Премиум** - 2999₽ (60 генераций)\n\n"
-        "✅ **Купить** → Перед оплатой ознакомьтесь с соглашением",
-        reply_markup=InlineKeyboardMarkup(
-            inline_keyboard=[[InlineKeyboardButton(text="Купить", callback_data="start_buy")]]
+    """Динамическое формирование списка пакетов генераций"""
+    await callback.message.edit_text("⏳ Загружаем актуальные пакеты...")
+
+    try:
+        # Получаем список пакетов из API
+        packages = await api_client.get_package_types()
+        if "error" in packages:
+            await callback.message.edit_text("❌ Ошибка при получении списка пакетов.")
+            return
+
+        # Формируем текст с пакетами
+        packages_text = "\n".join(
+            [f"📦 **{pkg['name']}** - {pkg['amount']}₽ ({pkg['total_generations']} генераций)" for pkg in packages]
         )
-    )
+
+        await callback.message.edit_text(
+            f"💰 **Стоимость пакетов**\n\n{packages_text}\n\n✅ **Купить** → Перед оплатой ознакомьтесь с соглашением",
+            reply_markup=InlineKeyboardMarkup(
+                inline_keyboard=[[InlineKeyboardButton(text="Купить", callback_data="start_buy")]]
+            ),
+            parse_mode="Markdown"
+        )
+
+    except Exception as e:
+        logging.error(f"Ошибка получения пакетов: {e}")
+        await callback.message.edit_text("❌ Ошибка при получении списка пакетов.")
+
     await callback.answer()
+
 
 
 @router.callback_query(lambda c: c.data == "start_buy")
