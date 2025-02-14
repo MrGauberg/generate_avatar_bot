@@ -3,11 +3,12 @@
 
 from aiogram import Router, types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-
+import logging
 from bot.services import api_client
 
 router = Router()
 
+logging.basicConfig(level=logging.INFO)
 
 @router.callback_query(lambda c: c.data == "start_instruction")
 async def instruction_step_1(callback: types.CallbackQuery):
