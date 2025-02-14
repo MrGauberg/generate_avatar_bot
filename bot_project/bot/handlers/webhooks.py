@@ -33,7 +33,7 @@ async def handle_payment_webhook(request):
 
 async def start_webhook_server():
     """Запускаем веб-сервер для обработки вебхуков"""
-    link = "/bot/payment-webhook/"
+    link = "/payment-webhook/"
     port = 8090 
     ip = "0.0.0.0"
     app = web.Application()
