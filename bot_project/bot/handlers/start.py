@@ -19,76 +19,71 @@ router = Router()
 
 @router.message(Command("start"))
 async def start_handler(message: types.Message):
-    """Обработчик команды /start. Проверяет авторизацию."""
+    """Приветственное сообщение с проверкой авторизации"""
     user_id = message.from_user.id
 
     try:
-        # Проверяем авторизацию пользователя
         user_data = await api_client.get_user_profile(user_id)
-        if user_data.get("is_authorized"):
-            # Пользователь авторизован → показываем главное меню
-            await message.answer("👋 Добро пожаловать!", reply_markup=main_menu_keyboard())
+        if user_data.get("is_authenticated"):
+            await message.answer(
+                "👋 Привет! Рад видеть тебя снова!\n\n"
+                "Выбери, что хочешь сделать сегодня: создать аватар, попробовать режим 'Бога' или просто поэкспериментировать с генерацией изображений!",
+                reply_markup=main_menu_keyboard()
+            )
             return
 
     except Exception as e:
         logging.error(f"Ошибка при проверке авторизации: {e}")
 
     await message.answer(
-        "❗ Вы не авторизованы. Чтобы начать, выберите:\n\n"
-        "🛒 **Купить** — оплатить генерации и создать аватар\n"
-        "ℹ **Инструкция** — узнать, как работает бот",
+        "👋 Привет! Добро пожаловать в нашего бота!\n\n"
+        "🎨 Здесь ты сможешь создать уникальный аватар по своим фото и генерировать изображения в разных стилях!\n\n"
+        "🔹 **Как это работает?**\n"
+        "1️⃣ Загрузи 10 своих фото\n"
+        "2️⃣ Выбери стиль или опиши картинку текстом (режим 'Бога')\n"
+        "3️⃣ Получи уникальные изображения!\n\n"
+        "💡 Готов начать? Выбери один из вариантов ниже:",
         reply_markup=start_keyboard()
     )
 
 
-# 🔄 Обработчики inline-кнопок
-@router.callback_query(lambda c: c.data == "menu_create_avatar")
-async def avatar_button_handler(callback: types.CallbackQuery):
-    """Обработка кнопки 'Создать аватар'"""
-    await avatar_callback_handler(callback)
-    await callback.answer()  # Добавляем callback.answer(), чтобы кнопка не зависала
+@router.message(lambda message: message.text == "🎨 Стили")
+async def styles_button_handler(message: types.Message):
+    """Обработка кнопки 'Стили'"""
+    await message.answer("Выберите стиль для генерации изображений.")
+    await generate_menu_callback(message)  # Переход в выбор стилей
 
 
-@router.callback_query(lambda c: c.data == "menu_generate_images")
-async def generate_button_handler(callback: types.CallbackQuery):
-    """Обработка кнопки 'Генерация изображений'"""
-    await generate_menu_callback(callback)
-    await callback.answer()
-
-
-@router.callback_query(lambda c: c.data == "menu_god_mode")
-async def god_mode_button_handler(callback: types.CallbackQuery):
+@router.message(lambda message: message.text == "🔮 Режим Бога")
+async def god_mode_button_handler(message: types.Message):
     """Обработка кнопки 'Режим Бога'"""
-    await god_mode_menu_callback(callback)
-    await callback.answer()
+    await god_mode_menu_callback(message)
 
 
-@router.callback_query(lambda c: c.data == "menu_settings")
-async def settings_button_handler(callback: types.CallbackQuery):
+@router.message(lambda message: message.text == "🖼 Аватар")
+async def avatar_button_handler(message: types.Message):
+    """Обработка кнопки 'Аватар'"""
+    await avatar_callback_handler(message)
+
+
+@router.message(lambda message: message.text == "💰 Генерации")
+async def generations_button_handler(message: types.Message):
+    """Обработка кнопки 'Генерации'"""
+    await message.answer("💰 Здесь вы можете посмотреть оставшиеся генерации или купить новые.")
+    await profile_menu_callback(message)  # Переход в профиль
+
+
+@router.message(lambda message: message.text == "⚙ Настройки")
+async def settings_button_handler(message: types.Message):
     """Обработка кнопки 'Настройки'"""
-    await settings_menu_callback(callback)
-    await callback.answer()
+    await settings_menu_callback(message)
 
 
-@router.callback_query(lambda c: c.data == "menu_support")
-async def support_button_handler(callback: types.CallbackQuery):
+@router.message(lambda message: message.text == "📞 Поддержка")
+async def support_button_handler(message: types.Message):
     """Обработка кнопки 'Поддержка'"""
-    await support_callback_handler(callback)
-    await callback.answer()
+    await support_callback_handler(message)
 
-
-@router.callback_query(lambda c: c.data == "menu_profile")
-async def profile_button_handler(callback: types.CallbackQuery):
-    """Обработка кнопки 'Профиль'"""
-    await profile_menu_callback(callback)
-    await callback.answer()
-
-
-@router.callback_query(lambda c: c.data == "menu_buy")
-async def buy_button_handler(callback: types.CallbackQuery):
-    """Обработка кнопки 'Купить генерации' (теперь через ukassa.py)"""
-    await request_email(callback)
-    await callback.answer()
 
 
 
