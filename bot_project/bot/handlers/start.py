@@ -9,7 +9,8 @@ from bot.handlers.god_mode import god_mode_menu_callback
 from bot.handlers.settings import settings_menu_callback
 from bot.handlers.support import support_callback_handler
 from bot.handlers.profile import profile_menu_callback
-from bot.handlers.payments import buy_menu_callback
+from bot.handlers.ukassa import request_email
+
 import logging
 from bot.services.api_client import api_client
 
@@ -85,8 +86,9 @@ async def profile_button_handler(callback: types.CallbackQuery):
 
 @router.callback_query(lambda c: c.data == "menu_buy")
 async def buy_button_handler(callback: types.CallbackQuery):
-    """Обработка кнопки 'Купить генерации'"""
-    await buy_menu_callback(callback)
+    """Обработка кнопки 'Купить генерации' (теперь через ukassa.py)"""
+    await request_email(callback)
     await callback.answer()
+
 
 

@@ -114,12 +114,6 @@ class APIClient:
         data = {"prompt": prompt, "model_id": model_id}
         return await self._make_request("POST", url, data)
 
-    async def purchase_generation_package(self, package_id: int) -> Any:
-        """Покупка пакета генераций"""
-        url = f"{self.base_api_url}/packages/yookassa-payment/create/"
-        data = {"package_id": package_id}
-        return await self._make_request("POST", url, data)
-
     async def enable_god_mode(self) -> Any:
         """Включение режима Бога"""
         url = f"{self.base_api_url}/god-mode/enable/"
@@ -135,11 +129,17 @@ class APIClient:
         url = f"{self.base_api_url}/users/{user_id}"
         return await self._make_request("GET", url)
 
-    async def create_payment(self, user_id: str, email: str, package_type_id: int) -> dict:
+    async def create_payment(self, user_id: int, email: str, package_type_id: int, message_id: int) -> dict:
         """Создание платежа через ЮKassa"""
         url = f"{self.base_api_url}/packages/yookassa-payment/create/"
-        data = {"user_id": user_id, "package_type_id": package_type_id, "email": email}
+        data = {
+            "user_id": user_id,
+            "package_type_id": package_type_id,
+            "email": email,
+            "message_id": message_id
+        }
         return await self._make_request("POST", url, data)
+
 
     async def get_package_types(self) -> list:
         """Получение списка типов пакетов генераций"""

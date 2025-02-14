@@ -77,22 +77,29 @@ async def create_payment(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.edit_text("⏳ Создаем платеж, подождите...")
 
     try:
-        # Отправляем запрос в API ЮKassa
         tg_user_id = callback.from_user.id
-        response = await api_client.create_payment(user_id=tg_user_id, email=email, package_type_id=package_type_id)
+        message = await callback.message.answer("💳 Ожидаем ссылку на оплату...")
+
+        # Передаем `message_id` в API при создании платежа
+        response = await api_client.create_payment(
+            user_id=tg_user_id,
+            email=email,
+            package_type_id=package_type_id,
+            message_id=message.message_id  # Передаем ID сообщения
+        )
+
         payment_url = response.get("payment_url")
 
         if payment_url:
-            await callback.message.edit_text(
-                f"✅ Нажмите для оплаты, 👇",
-                parse_mode="Markdown",
-                disable_web_page_preview=True,
+            await message.edit_text(
+                f"✅ Оплата создана! Перейдите по ссылке:",
                 reply_markup=pay_keyboard(payment_url)
             )
         else:
-            await callback.message.edit_text("❌ Ошибка при создании платежа.")
+            await message.edit_text("❌ Ошибка при создании платежа.")
     except Exception as e:
         logging.error(f"Ошибка создания платежа: {e}")
         await callback.message.edit_text(f"❌ Ошибка: {e}")
 
     await callback.answer()
+

@@ -74,3 +74,13 @@ services:
       DJANGO_SETTINGS_MODULE: core.settings
       PYTHONPATH: /app
     restart: always
+    
+  bot:
+    build: ./bot_project/
+    restart: always
+    env_file: .env
+    depends_on:
+      - backend
+    volumes:
+      - ./bot_project/:/app
+    command: ["python", "-m", "bot.main"]

@@ -10,7 +10,6 @@ from bot.handlers import avatar
 from bot.handlers import categories
 from bot.handlers import god_mode
 from bot.handlers import settings
-from bot.handlers import payments
 from bot.handlers import profile
 from bot.handlers import support
 from bot.handlers import generation
@@ -18,6 +17,7 @@ from bot.utils.logger import logger
 from bot.middlewares.throttle import ThrottleMiddleware
 from bot.handlers import instruction
 from bot.handlers import ukassa
+from bot.handlers.webhooks import start_webhook_server
 
 # Настраиваем логирование
 logging.basicConfig(level=logging.INFO)
@@ -31,7 +31,6 @@ dp.include_router(avatar.router)
 dp.include_router(categories.router)
 dp.include_router(god_mode.router)
 dp.include_router(settings.router)
-dp.include_router(payments.router)
 dp.include_router(profile.router)
 dp.include_router(support.router)
 dp.include_router(generation.router) 
@@ -70,7 +69,10 @@ async def main():
     await set_menu()
     
     try:
-        await dp.start_polling(bot)
+        await asyncio.gather(
+            dp.start_polling(bot),
+            start_webhook_server()
+        )
     finally:
         await api_client.close()
         await bot.session.close()

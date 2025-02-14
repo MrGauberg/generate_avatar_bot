@@ -1,4 +1,5 @@
 # packages/views.py
+import requests
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 
@@ -46,29 +47,35 @@ class CreatePaymentView(APIView):
         telegram_id = request.data.get("telegram_id")
         email = request.data.get("email")
         package_type_id = request.data.get("package_type_id")
+        message_id = request.data.get("message_id")  # Получаем message_id
 
         package_type = get_object_or_404(PackageType, id=package_type_id)
         amount = package_type.amount
-
         payment_id = str(uuid.uuid4())
 
         try:
             user, created = User.objects.get_or_create(
                 telegram_id=telegram_id,
-                defaults={"email": email, "username": email}  # Генерация уникального username
+                defaults={"email": email, "username": email}
             )
             package = Package.objects.create(
-                    user=user,
-                    package_type=package_type,
-                    generations_remains=package_type.total_generations
-                )
+                user=user,
+                package_type=package_type,
+                generations_remains=package_type.total_generations
+            )
 
             payment_data = {
                 "amount": {"value": str(amount), "currency": "RUB"},
                 "confirmation": {"type": "redirect", "return_url": "https://your-site.com/success"},
                 "capture": True,
                 "description": f"Покупка генераций {package_type.name}",
-                "metadata": {"payment_id": payment_id, "package_id": package.id, "user_id": user.id, "telegram_id": telegram_id},
+                "metadata": {
+                    "payment_id": payment_id,
+                    "package_id": package.id,
+                    "user_id": user.id,
+                    "telegram_id": telegram_id,
+                    "message_id": message_id  # Сохраняем message_id
+                },
             }
 
             payment = Payment.create(payment_data)
@@ -79,11 +86,12 @@ class CreatePaymentView(APIView):
                 amount=amount,
                 status="pending"
             )
-            
+
             return Response({"payment_url": payment.confirmation.confirmation_url}, status=status.HTTP_201_CREATED)
 
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class PaymentWebhookView(APIView):
@@ -95,13 +103,10 @@ class PaymentWebhookView(APIView):
         payment_id = metadata.get("payment_id")
         package_id = metadata.get("package_id")
         telegram_id = metadata.get("telegram_id")
+        message_id = metadata.get("message_id")  # Получаем message_id
         status_update = event_data.get("object", {}).get("status")
 
-        print(event_data)
-
-        user_id = metadata.get("user_id", None)
-
-        if not payment_id or not status_update or not package_id or not user_id:
+        if not payment_id or not status_update or not package_id or not telegram_id or not message_id:
             return Response({"error": "Invalid payload"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -110,14 +115,17 @@ class PaymentWebhookView(APIView):
             payment.save()
 
             if status_update == "succeeded":
-                user = get_object_or_404(User, id=user_id)
+                user = get_object_or_404(User, id=metadata["user_id"])
                 package = get_object_or_404(Package, id=package_id)
                 package.is_active = True
                 user.is_authorized = True
                 user.save()
                 package.save()
 
-            tele_bot.send_message(telegram_id, "✅ Оплата прошла успешно!")
+                # Отправляем вебхук в бота
+                webhook_url = f"{settings.API_URL}/bot/payment-webhook/"
+                requests.post(webhook_url, json={"user_id": telegram_id, "message_id": message_id})
+
             return Response({"message": "Payment status updated"}, status=status.HTTP_200_OK)
 
         except PaymentModel.DoesNotExist:
