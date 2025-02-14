@@ -11,11 +11,10 @@ from bot.handlers.support import support_callback_handler
 from bot.handlers.profile import profile_menu_callback
 from bot.handlers.ukassa import request_email
 
-import logging
+from bot.utils.logger import logger
 from bot.services.api_client import api_client
 
 router = Router()
-
 
 @router.message(Command("start"))
 async def start_handler(message: types.Message):
@@ -25,6 +24,7 @@ async def start_handler(message: types.Message):
     try:
         user_data = await api_client.get_user_profile(user_id)
         print(user_data)
+        logger.info(f"user_data {user_data}.")
         if user_data.get("is_authenticated"):
             await message.answer(
                 "👋 Привет! Рад видеть тебя снова!\n\n"
