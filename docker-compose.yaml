@@ -2,7 +2,6 @@ volumes:
   pg_data:
   static:
   media:
-  redis_data:
 
 services:
   db:
@@ -42,9 +41,6 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
-    volumes:
-      - redis_data:/data
-    command: redis-server --save 60 1 --loglevel warning
 
 
   celery:
