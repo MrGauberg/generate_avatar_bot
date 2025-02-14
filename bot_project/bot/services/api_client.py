@@ -126,7 +126,7 @@ class APIClient:
 
     async def get_user_profile(self, user_id: str) -> Any:
         """Получение профиля пользователя"""
-        url = f"{self.base_api_url}/users/{user_id}"
+        url = f"{self.base_api_url}/users/{user_id}/"
         return await self._make_request("GET", url)
 
     async def create_payment(self, user_id: int, email: str, package_type_id: int, message_id: int, telegram_id: int) -> dict:
