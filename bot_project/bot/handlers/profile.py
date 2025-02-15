@@ -7,6 +7,7 @@ from bot.keyboards.inline import profile_keyboard
 router = Router()
 
 
+
 @router.callback_query(lambda c: c.data == "menu_profile")
 async def profile_menu_callback(callback: types.CallbackQuery):
     """Обработка нажатия кнопки 'Профиль'"""

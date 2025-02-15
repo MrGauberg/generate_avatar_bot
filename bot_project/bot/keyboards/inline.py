@@ -1,6 +1,7 @@
 # bot/keyboards/inline.py
 
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from bot.config import Settings
 
 
 def gender_selection_keyboard():
@@ -42,21 +43,6 @@ def god_mode_keyboard():
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
 
-def get_payment_keyboard():
-    """Создает inline-клавиатуру с вариантами пакетов генераций"""
-    packages = [
-        {"id": 1, "name": "Пробный", "price": 199, "generations": 10},
-        {"id": 2, "name": "Старт", "price": 499, "generations": 15},
-        {"id": 3, "name": "Стандарт", "price": 1999, "generations": 30},
-        {"id": 4, "name": "Премиум", "price": 2999, "generations": 60},
-    ]
-
-    buttons = [
-        [InlineKeyboardButton(text=f"{pkg['name']} - {pkg['price']} руб.", callback_data=f"buy_{pkg['id']}")]
-        for pkg in packages
-    ]
-    return InlineKeyboardMarkup(inline_keyboard=buttons)
-
 
 def profile_keyboard():
     """Клавиатура профиля"""
@@ -85,12 +71,10 @@ def settings_keyboard():
 
 
 
-SUPPORT_USERNAME = "your_support_username"  # Укажите username службы поддержки
-
 def support_keyboard():
     """Клавиатура поддержки"""
     buttons = [
-        [InlineKeyboardButton(text="📞 Связаться с поддержкой", url=f"https://t.me/{SUPPORT_USERNAME}")]
+        [InlineKeyboardButton(text="📞 Связаться с поддержкой", url=f"https://t.me/{Settings.user.tg_user_name}")]
     ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
@@ -136,12 +120,15 @@ def get_avatar_slider_keyboard(avatars, page=0):
     if start_index > 0:
         nav_buttons.append(InlineKeyboardButton(text="⬅ Назад", callback_data=f"avatar_page_{page - 1}"))
     else:
+        if len(avatars) > avatars_per_page:
+            nav_buttons.append(InlineKeyboardButton(text=" ", callback_data="ignore"))
+    if len(avatars) > avatars_per_page:
         nav_buttons.append(InlineKeyboardButton(text=" ", callback_data="ignore"))
-    nav_buttons.append(InlineKeyboardButton(text=" ", callback_data="ignore"))
     if end_index < len(avatars):
         nav_buttons.append(InlineKeyboardButton(text="Вперед ➡", callback_data=f"avatar_page_{page + 1}"))
     else:
-        nav_buttons.append(InlineKeyboardButton(text=" ", callback_data="ignore"))
+        if len(avatars) > avatars_per_page:
+            nav_buttons.append(InlineKeyboardButton(text=" ", callback_data="ignore"))
 
     if nav_buttons:
         buttons.append(nav_buttons)
@@ -161,3 +148,10 @@ def add_avatar_keyboard():
         ]
     )
 
+def get_packages_keyboard():
+    """Клавиатура с кнопкой 'Выберите пакет'"""
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="🛒 Выберите пакет", callback_data="choose_package")]
+        ]
+    )

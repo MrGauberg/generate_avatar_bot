@@ -15,13 +15,14 @@ class BotConfig:
 class UserConfig:
     email: str = os.getenv("USER_EMAIL")
     password: str = os.getenv("USER_PASSWORD")
+    tg_user_name: str = os.getenv("ADMIN_TG")
 
 class YookassaConfig:
     SHOP_ID = os.getenv("YOOKASSA_SHOP_ID")
     SECRET_KEY = os.getenv("YOOKASSA_SECRET_KEY")
 
 class ServiceConfig:
-    AVATAR_IMAGES_COUNT: int = int(os.getenv("AVATAR_IMAGES_COUNT", 10))
+    IMAGES_COUNT: int = int(os.getenv("IMAGES_COUNT", 10))
 
 
 class Settings:

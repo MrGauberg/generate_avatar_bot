@@ -7,6 +7,8 @@ import logging
 
 bot = Bot(token=Settings.bot.TOKEN)
 
+IMAGES_COUNT = Settings.service.IMAGES_COUNT
+
 async def handle_payment_webhook(request):
     """Обработчик вебхука для подтверждения платежа"""
     try:
@@ -18,7 +20,7 @@ async def handle_payment_webhook(request):
             return web.json_response({"error": "Missing user_id or message_id"}, status=400)
 
         await bot.edit_message_text(
-            "✅ Оплата прошла успешно!\nТеперь отправьте 10 фото для создания аватара.",
+            f"✅ Оплата прошла успешно!\nТеперь отправьте {IMAGES_COUNT} фото для создания аватара.",
             chat_id=user_id,
             message_id=message_id
         )

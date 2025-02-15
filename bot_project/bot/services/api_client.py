@@ -89,6 +89,19 @@ class APIClient:
         url = f"{self.base_api_url}/avatars/avatar/price/"
         response = await self._make_request("GET", url)
         return float(response.get("price", 490.00))
+    
+
+    async def get_user_packeges(self, tg_user_id: int) -> Any:
+        """Получение списка пакетов генерациий для пользователя"""
+        url = f"{self.base_api_url}/packages/user-packages/{tg_user_id}/"
+        #     Пример ответа:
+        # [
+        #     {
+        #         "package_name": "Базовый",
+        #         "generations_remains": 20,
+        #     }
+        # ]
+        return await self._make_request("GET", url)
 
     async def create_avatar(self, files: List[Tuple[str, Tuple[str, bytes, str]]], gender: str, tg_user_id: int) -> Any:
         """Загрузка фотографий для создания аватара"""

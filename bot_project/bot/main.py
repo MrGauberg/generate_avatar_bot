@@ -36,7 +36,7 @@ dp.include_router(support.router)
 dp.include_router(generation.router) 
 dp.include_router(instruction.router)
 dp.include_router(ukassa.router)
-dp.message.middleware(ThrottleMiddleware(rate_limit=0.3))  # Подключаем антифлуд
+# dp.message.middleware(ThrottleMiddleware(rate_limit=0.3))  # антифлуд
 
 
 async def set_menu():

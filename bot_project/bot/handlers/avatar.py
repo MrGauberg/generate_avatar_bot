@@ -17,7 +17,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 router = Router()
 
-MAX_PHOTOS = Settings.service.AVATAR_IMAGES_COUNT
+MAX_PHOTOS = Settings.service.IMAGES_COUNT
 
 # Храним загруженные фото временно (можно заменить на БД)
 user_photos = {}
@@ -27,10 +27,16 @@ GENDER_CHOICES = {
     "avatar_gender_child": "child",
 }
 
+allowed_users = set()
+
 
 @router.callback_query(lambda c: c.data == "menu_create_avatar")
 async def avatar_callback_handler(callback: types.CallbackQuery):
     """Обработка нажатия кнопки 'Создать аватар'"""
+
+    user_id = callback.from_user.id
+    allowed_users.add(user_id)
+
     await callback.message.edit_text(
         f"📸 Отправьте мне {MAX_PHOTOS} фотографий для создания аватара.\n"
         "Фотографии должны быть разными и хорошо освещенными!"
@@ -41,23 +47,33 @@ async def avatar_callback_handler(callback: types.CallbackQuery):
 
 @router.message(lambda message: message.photo)
 async def handle_photo_upload(message: types.Message):
-    """Обработка загруженных фотографий"""
+    """Обработка загруженных фотографий (исправление дублирования)"""
     user_id = message.from_user.id
+
+    if user_id not in allowed_users:
+        await message.answer("⚠ Пожалуйста, сначала запросите создание аватара через меню!")
+        return
 
     if user_id not in user_photos:
         user_photos[user_id] = []
 
-    user_photos[user_id].append(message.photo[-1].file_id)
+    # Берем ТОЛЬКО самое большое фото
+    largest_photo = message.photo[-1].file_id
 
     if len(user_photos[user_id]) < MAX_PHOTOS:
-        await message.answer(
-            f"📷 Принято! Загружено {len(user_photos[user_id])}/{MAX_PHOTOS} фото."
-        )
+        user_photos[user_id].append(largest_photo)
+
+    # Сообщаем о количестве загруженных фото
+    uploaded_count = len(user_photos[user_id])
+    if uploaded_count < MAX_PHOTOS:
+        await message.answer(f"📷 Принято! Загружено {uploaded_count}/{MAX_PHOTOS} фото.")
     else:
         await message.answer(
             "✅ Все фото загружены!\nВыберите пол аватара:",
             reply_markup=gender_selection_keyboard(),
         )
+        allowed_users.discard(user_id)  # Запрещаем загрузку после 10 фото
+
 
 
 @router.callback_query(lambda c: c.data in GENDER_CHOICES)

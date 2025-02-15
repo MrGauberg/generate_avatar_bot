@@ -2,9 +2,79 @@
 
 from aiogram import Router, types
 from bot.services.api_client import api_client
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from bot.keyboards.inline import get_categories_keyboard, get_styles_keyboard
+from bot.keyboards.inline import get_packages_keyboard
 
 router = Router()
+
+
+@router.message(lambda message: message.text == "💰 Генерации")
+async def generations_button_handler(message: types.Message):
+    """Обработка кнопки 'Генерации'"""
+    user_id = message.from_user.id
+
+    await message.answer("⏳ Получаем информацию о ваших генерациях...")
+
+    try:
+        user_packages = await api_client.get_user_packeges(user_id)
+
+        if not user_packages:
+            await message.answer("❌ У вас нет активных пакетов генераций.")
+            return
+
+        packages_text = "\n".join(
+            [f"📦 **{pkg['package_name']}** — Осталось {pkg['generations_remains']} генераций"
+             for pkg in user_packages]
+        )
+
+        total_generations = sum(pkg["generations_remains"] for pkg in user_packages)
+
+        await message.answer(
+            f"💰 **Ваши генерации**\n\n"
+            f"📊 Общее количество доступных генераций: **{total_generations}**\n\n"
+            f"{packages_text}\n\n"
+            "🔹 Если генерации закончились, выберите новый пакет ниже:",
+            reply_markup=get_packages_keyboard()
+        )
+
+    except Exception as e:
+        await message.answer(f"❌ Ошибка при получении данных: {e}")
+
+
+@router.callback_query(lambda c: c.data == "choose_package")
+async def choose_package_handler(callback: types.CallbackQuery):
+    """Вывод списка пакетов для покупки"""
+    await callback.message.edit_text("⏳ Загружаем доступные пакеты...")
+
+    try:
+        packages = await api_client.get_package_types()
+        if not packages:
+            await callback.message.edit_text("❌ Ошибка при получении списка пакетов.")
+            return
+
+        buttons = [
+            [InlineKeyboardButton(text=f"📦 {pkg['name']} - {pkg['amount']}₽", callback_data=f"payment_{pkg['id']}")]
+            for pkg in packages
+        ]
+        buttons.append([InlineKeyboardButton(text="🔙 Назад", callback_data="back_to_generations")])
+
+        await callback.message.edit_text(
+            "💰 **Выберите пакет для покупки:**",
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=buttons)
+        )
+
+    except Exception as e:
+        await callback.message.edit_text(f"❌ Ошибка при получении пакетов: {e}")
+
+    await callback.answer()
+
+@router.callback_query(lambda c: c.data == "back_to_generations")
+async def back_to_generations_handler(callback: types.CallbackQuery):
+    """Возвращение к информации о генерациях"""
+    await generations_button_handler(callback.message)
+    await callback.answer()
+
 
 
 @router.callback_query(lambda c: c.data == "menu_generate_images")
