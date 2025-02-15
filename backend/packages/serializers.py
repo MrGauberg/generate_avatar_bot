@@ -7,7 +7,7 @@ class PackageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Package
-        fields = ('id', 'user', 'name', 'package_type', 'total_generations', 'used_generations', 'purchase_date', 'remaining_generations')
+        fields = ('id', 'user', 'package_type', 'total_generations', 'used_generations', 'purchase_date', 'remaining_generations')
 
 
 class PackageTypeSerializer(serializers.ModelSerializer):

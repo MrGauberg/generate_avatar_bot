@@ -21,7 +21,6 @@ class Package(models.Model):
         ('basic', 'Базовый'),
         ('premium', 'Премиум'),
     )
-    name = models.CharField(max_length=40, default='Базовый')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='packages')
     package_type = models.ForeignKey(PackageType, on_delete=models.CASCADE)
     generations_remains = models.IntegerField(default=0)

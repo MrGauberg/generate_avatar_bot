@@ -3,7 +3,7 @@ from .models import Package, PackageType, Payment
 
 @admin.register(Package)
 class PackageAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'name', 'package_type', 'generations_remains', 'purchase_date')
+    list_display = ('id', 'user', 'package_type', 'generations_remains', 'purchase_date')
     search_fields = ('user__username', 'package_type__name')
     list_filter = ('package_type', 'purchase_date')
     ordering = ('-purchase_date',)
