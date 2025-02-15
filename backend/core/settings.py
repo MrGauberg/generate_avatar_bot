@@ -137,7 +137,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Celery Configuration Options
 CELERY_BROKER_URL = "redis://redis:6379/0"  # URL брокера (Redis)
-CELERY_RESULT_BACKEND = "redis://redis:6379/0"  # Хранилище результатов
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 CELERY_RESULT_EXPIRES = 604800
 CELERY_TASK_TRACK_STARTED = True  # Отслеживать статус "выполняется"
