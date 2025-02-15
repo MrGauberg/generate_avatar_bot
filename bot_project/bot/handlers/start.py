@@ -59,12 +59,6 @@ async def god_mode_button_handler(message: types.Message):
     await god_mode_menu_callback(message)
 
 
-@router.message(lambda message: message.text == "💰 Генерации")
-async def generations_button_handler(message: types.Message):
-    """Обработка кнопки 'Генерации'"""
-    await message.answer("💰 Здесь вы можете посмотреть оставшиеся генерации или купить новые.")
-    await profile_menu_callback(types.CallbackQuery(message=message, from_user=message.from_user))
-
 
 @router.message(lambda message: message.text == "⚙ Настройки")
 async def settings_button_handler(message: types.Message):
