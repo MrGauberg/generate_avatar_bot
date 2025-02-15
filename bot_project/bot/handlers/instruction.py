@@ -114,7 +114,7 @@ async def confirm_terms(callback: types.CallbackQuery):
 async def request_email(callback: types.CallbackQuery, state: FSMContext):
     """Запрос email перед оплатой"""
     await callback.message.edit_text(
-        "📧 Введите ваш email для получения чека и подтверждения оплаты:"
+        "📧 Введите ваш email для подтверждения оплаты:"
     )
     await state.set_state(PaymentState.waiting_for_email)
     await callback.answer()

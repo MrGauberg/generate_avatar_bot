@@ -46,7 +46,7 @@ class AvatarUploadView(APIView):
     parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request):
-        user = request.user
+        tg_user_id = request.data.get("tg_user_id")  
         files = request.FILES.getlist("images")
         gender = request.data.get("gender", "male")
         
@@ -54,6 +54,7 @@ class AvatarUploadView(APIView):
             return Response({"error": f"Должно быть ровно {settings.AVATAR_IMAGES_COUNT} изображений"}, status=status.HTTP_400_BAD_REQUEST)
 
         # Создаем аватар и сохраняем изображения
+        user = get_object_or_404(User, telegram_id=tg_user_id)
         avatar_response = LeonardoService.create_avatar(user, gender, files)
 
         if "error" in avatar_response:

@@ -90,10 +90,10 @@ class APIClient:
         response = await self._make_request("GET", url)
         return float(response.get("price", 490.00))
 
-    async def create_avatar(self, files: List[Tuple[str, Tuple[str, bytes, str]]], gender: str) -> Any:
+    async def create_avatar(self, files: List[Tuple[str, Tuple[str, bytes, str]]], gender: str, tg_user_id: int) -> Any:
         """Загрузка фотографий для создания аватара"""
         url = f"{self.base_api_url}/avatars/upload/"
-        data = {"gender": gender}
+        data = {"gender": gender, "tg_user_id": tg_user_id}
         return await self._make_request("POST", url, data, files)
     
     async def check_avatar_slots(self, tg_user_id):
@@ -103,12 +103,6 @@ class APIClient:
     async def buy_avatart_slot(self, data):
         url = f"{self.base_api_url}/payments/avatar/"
         return await self._make_request("POST", url, data)
-
-    async def create_avatar(self, files: List[Tuple[str, Tuple[str, bytes, str]]], gender: str) -> Any:
-        """Загрузка фотографий для создания аватара"""
-        url = f"{self.base_api_url}/avatars/upload/"
-        data = {"gender": gender}
-        return await self._make_request("POST", url, data, files)
 
     async def get_user_avatars(self, user_tg_id) -> Any:
         """Получение списка аватаров"""
