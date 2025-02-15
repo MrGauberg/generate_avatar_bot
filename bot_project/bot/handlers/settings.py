@@ -8,10 +8,16 @@ router = Router()
 
 
 @router.callback_query(lambda c: c.data == "menu_settings")
-async def settings_menu_callback(callback: types.CallbackQuery):
-    """Обработка нажатия кнопки 'Настройки'"""
-    await callback.message.edit_text("⚙ Выберите формат фото:", reply_markup=settings_keyboard())
-    await callback.answer()
+@router.message(lambda message: message.text == "⚙ Настройки")
+async def settings_menu_callback(event: types.Message | types.CallbackQuery):
+    """Обработчик кнопки 'Настройки'"""
+    if isinstance(event, types.CallbackQuery):
+        message = event.message
+    else:
+        message = event
+
+    await message.answer("⚙ Выберите настройки:", reply_markup=settings_menu_keyboard())
+
 
 
 @router.callback_query(lambda c: c.data.startswith("settings_"))

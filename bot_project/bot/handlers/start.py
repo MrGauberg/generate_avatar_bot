@@ -66,6 +66,7 @@ async def settings_button_handler(message: types.Message):
     await settings_menu_callback(message)
 
 
+
 @router.message(lambda message: message.text == "📞 Поддержка")
 async def support_button_handler(message: types.Message):
     """Обработка кнопки 'Поддержка'"""
