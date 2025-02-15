@@ -10,25 +10,35 @@ router = Router()
 
 
 @router.message(lambda message: message.text == "💰 Генерации")
-async def generations_button_handler(message: types.Message):
+@router.callback_query(lambda c: c.data == "show_generations")
+async def generations_button_handler(event: types.Message | types.CallbackQuery):
     """Обработка кнопки 'Генерации'"""
-    user_id = message.from_user.id
+    user_id = event.from_user.id
+
+    if isinstance(event, types.CallbackQuery):
+        message = event.message
+    else:
+        message = event
 
     await message.answer("⏳ Получаем информацию о ваших генерациях...")
 
     try:
         user_packages = await api_client.get_user_packeges(user_id)
 
+        if not isinstance(user_packages, list):
+            await message.answer("❌ Ошибка при получении данных о генерациях.")
+            return
+
         if not user_packages:
             await message.answer("❌ У вас нет активных пакетов генераций.")
             return
 
         packages_text = "\n".join(
-            [f"📦 **{pkg['package_name']}** — Осталось {pkg['generations_remains']} генераций"
+            [f"📦 **{pkg.get('package_name', 'Неизвестный пакет')}** — Осталось {pkg.get('generations_remains', 0)} генераций"
              for pkg in user_packages]
         )
 
-        total_generations = sum(pkg["generations_remains"] for pkg in user_packages)
+        total_generations = sum(pkg.get("generations_remains", 0) for pkg in user_packages)
 
         await message.answer(
             f"💰 **Ваши генерации**\n\n"
@@ -73,7 +83,7 @@ async def choose_package_handler(callback: types.CallbackQuery):
 @router.callback_query(lambda c: c.data == "back_to_generations")
 async def back_to_generations_handler(callback: types.CallbackQuery):
     """Возвращение к информации о генерациях"""
-    await generations_button_handler(callback.message)
+    await generations_button_handler(callback)
     await callback.answer()
 
 
