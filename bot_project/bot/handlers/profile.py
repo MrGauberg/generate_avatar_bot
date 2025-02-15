@@ -9,10 +9,18 @@ router = Router()
 
 
 @router.callback_query(lambda c: c.data == "menu_profile")
-async def profile_menu_callback(callback: types.CallbackQuery):
-    """Обработка нажатия кнопки 'Профиль'"""
-    await send_profile_info(callback.message, callback.from_user.id)
-    await callback.answer()
+@router.message(lambda message: message.text == "👤 Профиль")
+async def profile_menu_callback(event: types.Message | types.CallbackQuery):
+    """Обработчик кнопки 'Профиль'"""
+    user_id = event.from_user.id
+
+    if isinstance(event, types.CallbackQuery):
+        message = event.message
+    else:
+        message = event
+
+    await send_profile_info(message, user_id)
+
 
 
 @router.callback_query(lambda c: c.data == "profile_refresh")

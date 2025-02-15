@@ -42,6 +42,7 @@ async def generations_button_handler(message: types.Message):
         await message.answer(f"❌ Ошибка при получении данных: {e}")
 
 
+
 @router.callback_query(lambda c: c.data == "choose_package")
 async def choose_package_handler(callback: types.CallbackQuery):
     """Вывод списка пакетов для покупки"""
