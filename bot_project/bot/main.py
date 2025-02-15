@@ -10,7 +10,6 @@ from bot.handlers import avatar
 from bot.handlers import categories
 from bot.handlers import god_mode
 from bot.handlers import settings
-from bot.handlers import profile
 from bot.handlers import support
 from bot.handlers import generation
 from bot.utils.logger import logger
@@ -31,7 +30,6 @@ dp.include_router(avatar.router)
 dp.include_router(categories.router)
 dp.include_router(god_mode.router)
 dp.include_router(settings.router)
-dp.include_router(profile.router)
 dp.include_router(support.router)
 dp.include_router(generation.router) 
 dp.include_router(instruction.router)
