@@ -8,6 +8,7 @@ import tempfile
 import os
 import logging
 import aiofiles
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 router = Router()
 
@@ -170,32 +171,41 @@ async def return_to_avatar_menu(callback: types.CallbackQuery):
 
 @router.callback_query(lambda c: c.data == "avatar_add")
 async def add_avatar_handler(callback: types.CallbackQuery):
-    """Обработка добавления нового аватара"""
-    price = await api_client.get_avatar_price()
+    """Проверка доступных слотов и покупка слота"""
+    tg_user_id = callback.from_user.id
+    response = await api_client._make_request("GET", f"{api_client.BASE_API_URL}/avatars/check-slots/{tg_user_id}")
 
-    await callback.message.edit_text(
-        f"🔹 Ты можешь иметь сразу несколько аватаров и выбирать любой из них для генерации изображений.\n\n"
-        f"💰 **Стоимость добавления нового аватара: {price:.2f}₽**\n\n"
-        "Выбери действие:",
-        reply_markup=add_avatar_keyboard()
-    )
+    if response.get("can_add_avatar"):
+        await callback.message.edit_text(
+            "📸 У вас есть свободный слот! Приступаем к созданию аватара."
+        )
+        await avatar_callback_handler(callback)
+    else:
+        price = await api_client.get_avatar_price()
+        await callback.message.edit_text(
+            f"🔹 У вас нет свободных слотов для нового аватара.\n"
+            f"💰 **Стоимость добавления слота: {price:.2f}₽**\n\n"
+            "Выберите действие:",
+            reply_markup=add_avatar_keyboard()
+        )
     await callback.answer()
-
 
 
 @router.callback_query(lambda c: c.data == "avatar_buy")
 async def buy_avatar_handler(callback: types.CallbackQuery):
-    """Создание платежа для добавления аватара"""
-    await callback.message.edit_text("⏳ Создаем платеж на 490₽, подождите...")
+    """Создание платежа для добавления слота аватара"""
+    await callback.message.edit_text("⏳ Создаем платеж, подождите...")
 
     try:
         tg_user_id = callback.from_user.id
-        response = await api_client.create_payment(
-            user_id=tg_user_id,
-            email="avatar_payment@bot.com",
-            package_type_id=5,  # ID пакета для покупки аватара (нужно настроить в API)
-            message_id=callback.message.message_id,
-            telegram_id=tg_user_id
+        response = await api_client._make_request(
+            "POST",
+            f"{api_client.BASE_API_URL}/avatars/buy-slot/",
+            {
+                "telegram_id": tg_user_id,
+                "email": "avatar_payment@bot.com",
+                "message_id": callback.message.message_id,
+            }
         )
 
         payment_url = response.get("payment_url")
@@ -213,3 +223,4 @@ async def buy_avatar_handler(callback: types.CallbackQuery):
         await callback.message.edit_text(f"❌ Ошибка: {e}")
 
     await callback.answer()
+

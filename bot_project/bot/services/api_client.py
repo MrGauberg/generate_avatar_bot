@@ -87,7 +87,7 @@ class APIClient:
 
     async def get_avatar_price(self) -> float:
         """Получает стоимость аватара из API"""
-        url = f"{self.base_api_url}/avatar/price/"
+        url = f"{self.base_api_url}/avatars/avatar/price/"
         response = await self._make_request("GET", url)
         return float(response.get("price", 490.00))
 

@@ -8,6 +8,7 @@ class CustomUser(AbstractUser):
     telegram_id = models.CharField(max_length=50, blank=True, null=True)
     email = models.EmailField(unique=True)
     is_authorized = models.BooleanField(default=False)
+    avatars_amount_available = models.IntegerField(default=1)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
