@@ -47,7 +47,7 @@ class CreatePaymentView(APIView):
         telegram_id = request.data.get("telegram_id")
         email = request.data.get("email")
         package_type_id = request.data.get("package_type_id")
-        message_id = request.data.get("message_id")  # Получаем message_id
+        message_id = request.data.get("message_id")
 
         package_type = get_object_or_404(PackageType, id=package_type_id)
         amount = package_type.amount
