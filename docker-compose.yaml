@@ -49,7 +49,7 @@ services:
   celery:
     build:
       context: ./backend/
-    # entrypoint: sh entrypoint.sh
+    entrypoint: sh entrypoint.sh
     env_file: .env
     command: celery -A core worker --loglevel=info
     volumes:
