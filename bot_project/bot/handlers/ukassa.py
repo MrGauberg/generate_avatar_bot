@@ -61,6 +61,10 @@ async def create_payment(callback: types.CallbackQuery, state: FSMContext):
     email = user_data.get("email")
 
     if not email:
+        respone  = await api_client.get_user_profile(callback.from_user.id)
+        email = respone.get("email")
+
+    if not email:
         await callback.message.edit_text("❌ Ошибка: Email не найден. Попробуйте заново.")
         return
 
