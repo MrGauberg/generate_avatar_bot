@@ -34,7 +34,7 @@ async def refresh_profile_callback(callback: types.CallbackQuery):
 async def send_profile_info(message: types.Message, user_id: int):
     """Функция отправки информации о профиле"""
     try:
-        response = await api_client._make_request("GET", f"{api_client.BASE_API_URL}/user/profile")
+        response = await api_client.get_user_profile(user_id)
         
         if response:
             username = response.get("username", "Не указано")

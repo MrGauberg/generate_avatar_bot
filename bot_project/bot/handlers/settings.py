@@ -26,7 +26,7 @@ async def handle_photo_format_selection_callback(callback: types.CallbackQuery):
     selected_format = callback.data.split("_")[1]
 
     try:
-        await api_client._make_request("POST", f"{api_client.BASE_API_URL}/settings/photo-format", {"format": selected_format})
+        await api_client.set_photo_format(callback.from_user.id, selected_format)
         await callback.message.edit_text(f"✅ Формат фото установлен: {selected_format}")
     except Exception as e:
         await callback.message.edit_text(f"❌ Ошибка при установке формата: {e}")
