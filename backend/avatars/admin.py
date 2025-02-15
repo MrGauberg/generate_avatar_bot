@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Avatar, AvatarImage
+from .models import Avatar, AvatarImage, AvatarSettings
 
 @admin.register(Avatar)
 class AvatarAdmin(admin.ModelAdmin):
@@ -13,4 +13,9 @@ class AvatarImageAdmin(admin.ModelAdmin):
     list_display = ('id', 'avatar', 'image')
     search_fields = ('avatar__user__username',)
     list_filter = ('avatar__gender',)
+
+@admin.register(AvatarSettings)
+class AvatarSettingsAdmin(admin.ModelAdmin):
+    list_display = ('id', 'price')
+    search_fields = ('price',)
 
