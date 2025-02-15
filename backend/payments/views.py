@@ -19,8 +19,10 @@ User = get_user_model()
 Configuration.account_id = settings.YOOKASSA_SHOP_ID
 Configuration.secret_key = settings.YOOKASSA_SECRET_KEY
 
+
 class BasePaymentView(APIView):
     """Базовый класс для создания платежей"""
+
     permission_classes = [IsAuthenticated]
 
     def create_payment(self, user, amount, description, metadata):
@@ -28,7 +30,10 @@ class BasePaymentView(APIView):
 
         payment_data = {
             "amount": {"value": str(amount), "currency": "RUB"},
-            "confirmation": {"type": "redirect", "return_url": f"https://t.me/{settings.BOT_TG}"},
+            "confirmation": {
+                "type": "redirect",
+                "return_url": f"https://t.me/{settings.BOT_TG}",
+            },
             "capture": True,
             "description": description,
             "metadata": {**metadata, "payment_id": payment_id},
@@ -42,7 +47,7 @@ class BasePaymentView(APIView):
             payment_id=payment_id,
             amount=amount,
             status="pending",
-            metadata=metadata
+            metadata=metadata,
         )
 
         return payment.confirmation.confirmation_url
@@ -55,10 +60,13 @@ class CreatePackagePaymentView(BasePaymentView):
         telegram_id = request.data.get("telegram_id")
         package_type_id = request.data.get("package_type_id")
         message_id = request.data.get("message_id")
+        email = request.data.get("email")
 
         print(request.data)
-        
-        user = get_object_or_404(User, telegram_id=telegram_id)
+
+        user, created = User.objects.get_or_create(
+            telegram_id=telegram_id, defaults={"email": email, "username": email}
+        )
         package = get_object_or_404(PackageType, id=package_type_id)
 
         payment_url = self.create_payment(
@@ -70,7 +78,7 @@ class CreatePackagePaymentView(BasePaymentView):
                 "message_id": message_id,
                 "type": "package",
                 "package_id": package.id,
-            }
+            },
         )
 
         return Response({"payment_url": payment_url}, status=201)
@@ -90,11 +98,7 @@ class CreateAvatarPaymentView(BasePaymentView):
             user,
             avatar_price,
             "Покупка слота для аватара",
-            {
-                "telegram_id": telegram_id,
-                "message_id": message_id,
-                "type": "avatar"
-            }
+            {"telegram_id": telegram_id, "message_id": message_id, "type": "avatar"},
         )
 
         return Response({"payment_url": payment_url}, status=201)
@@ -113,7 +117,9 @@ class YooKassaWebhookView(APIView):
         status_update = event_data.get("object", {}).get("status")
 
         if not payment_id or not status_update or not telegram_id or not message_id:
-            return Response({"error": "Invalid payload"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Invalid payload"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
         try:
             payment = PaymentRecord.objects.get(payment_id=payment_id)
@@ -135,9 +141,15 @@ class YooKassaWebhookView(APIView):
 
                 # Уведомляем бота о статусе оплаты
                 webhook_url = f"{settings.API_URL}/bot/payment-webhook/"
-                requests.post(webhook_url, json={"user_id": telegram_id, "message_id": message_id})
+                requests.post(
+                    webhook_url, json={"user_id": telegram_id, "message_id": message_id}
+                )
 
-            return Response({"message": "Payment status updated"}, status=status.HTTP_200_OK)
+            return Response(
+                {"message": "Payment status updated"}, status=status.HTTP_200_OK
+            )
 
         except PaymentRecord.DoesNotExist:
-            return Response({"error": "Payment not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "Payment not found"}, status=status.HTTP_404_NOT_FOUND
+            )
