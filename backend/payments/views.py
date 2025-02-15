@@ -69,6 +69,12 @@ class CreatePackagePaymentView(BasePaymentView):
         )
         package = get_object_or_404(PackageType, id=package_type_id)
 
+        Package.objects.create(
+            user=user,
+            package_type=package,
+            total_generations=package.total_generations,
+        )
+
         payment_url = self.create_payment(
             user,
             package.amount,
@@ -137,7 +143,7 @@ class YooKassaWebhookView(APIView):
                     package.save()
                 elif payment_type == "avatar":
                     user.avatars_amount_available += 1
-                    user.save()
+                user.save()
 
                 # Уведомляем бота о статусе оплаты
                 webhook_url = f"{settings.API_URL}/bot/payment-webhook/"
