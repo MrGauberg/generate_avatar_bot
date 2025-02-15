@@ -31,7 +31,7 @@ class AvatarViewSet(viewsets.ModelViewSet):
         avatar = self.get_object()
         avatar.is_active = True
         avatar.save()
-        Avatar.objects.exclude(id=avatar.id, user=request.user).update(is_active=False)
+        Avatar.objects.exclude(id=avatar.id).update(is_active=False)
         return JsonResponse({"detail": "Аватар успешно активирован"})
     
 

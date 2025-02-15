@@ -106,13 +106,6 @@ class PaymentWebhookView(APIView):
         message_id = metadata.get("message_id")  # Получаем message_id
         status_update = event_data.get("object", {}).get("status")
 
-        print(f"""
-        payment_id: {payment_id}
-        package_id: {package_id}
-        telegram_id: {telegram_id}
-        message_id: {message_id}
-        status_update: {status_update}
-        """)
         if not payment_id or not status_update or not package_id or not telegram_id or not message_id:
             return Response({"error": "Invalid payload"}, status=status.HTTP_400_BAD_REQUEST)
 

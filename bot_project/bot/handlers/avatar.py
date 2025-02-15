@@ -80,7 +80,6 @@ async def handle_gender_choice(callback: types.CallbackQuery, bot: Bot):
                 if file_data:
                     files.append(("images", (f"photo_{i}.jpg", file_data, "image/jpeg")))
 
-        print("Файлы, отправляемые в API:", len(files))
 
         # Отправляем файлы в API
         response = await api_client.create_avatar(files=files, gender=gender)
@@ -152,7 +151,7 @@ async def activate_avatar_handler(callback: types.CallbackQuery):
     try:
         response = await api_client.activate_avatar(avatar_id)
         if not response.get("error"):
-            await callback.message.edit_text(f"✅ Аватар {avatar_name} выбран!")
+            await callback.message.edit_text(f"Модель {avatar_name} выбрана, теперь генерируем фотографии с этой моделью✅")
         else:
             await callback.message.edit_text("❌ Ошибка при выборе аватара.")
     except Exception as e:
