@@ -20,12 +20,6 @@ async def settings_menu_callback(event: types.Message | types.CallbackQuery):
 
 
 
-@router.message(lambda message: message.text == "⚙ Настройки")
-async def settings_button_handler(message: types.Message):
-    """Обработка кнопки 'Настройки'"""
-    await message.answer("⚙ Выберите настройки:", reply_markup=settings_menu_keyboard())
-
-
 @router.callback_query(lambda c: c.data == "settings_photo_format")
 async def choose_photo_format(callback: types.CallbackQuery):
     """Вывод списка форматов фото"""

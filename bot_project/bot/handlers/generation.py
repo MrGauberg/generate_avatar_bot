@@ -53,35 +53,6 @@ async def generations_button_handler(event: types.Message | types.CallbackQuery)
 
 
 
-@router.callback_query(lambda c: c.data == "choose_package")
-async def choose_package_handler(callback: types.CallbackQuery):
-    """Вывод списка пакетов для покупки"""
-    await callback.message.edit_text("⏳ Загружаем доступные пакеты...")
-
-    try:
-        packages = await api_client.get_package_types()
-        if not packages:
-            await callback.message.edit_text("❌ Ошибка при получении списка пакетов.")
-            return
-
-        buttons = [
-            [InlineKeyboardButton(text=f"📦 {pkg['name']} - {pkg['amount']}₽", callback_data=f"payment_{pkg['id']}")]
-            for pkg in packages
-        ]
-        buttons.append([InlineKeyboardButton(text="📞 Поддержка", callback_data="menu_support")])
-        buttons.append([InlineKeyboardButton(text="🔙 Назад", callback_data="back_to_generations")])
-
-        await callback.message.edit_text(
-            "💰 **Выберите пакет для покупки:**",
-            reply_markup=InlineKeyboardMarkup(inline_keyboard=buttons)
-            
-        )
-
-    except Exception as e:
-        await callback.message.edit_text(f"❌ Ошибка при получении пакетов: {e}")
-
-    await callback.answer()
-
 @router.callback_query(lambda c: c.data == "back_to_generations")
 async def back_to_generations_handler(callback: types.CallbackQuery):
     """Возвращение к информации о генерациях"""
@@ -107,15 +78,6 @@ async def get_style_buttons(category_id):
     """Создает inline-кнопки со стилями для выбранной категории"""
     styles = await api_client.get_styles_list()
     return get_styles_keyboard(styles, category_id)
-
-
-@router.callback_query(lambda c: c.data.startswith("category_"))
-async def category_selected_callback(callback: types.CallbackQuery):
-    """Обработка выбора категории"""
-    category_id = int(callback.data.split("_")[1])
-    keyboard = await get_style_buttons(category_id)
-    await callback.message.edit_text("🎨 Выберите стиль:", reply_markup=keyboard)
-    await callback.answer()
 
 
 @router.callback_query(lambda c: c.data.startswith("generate_"))

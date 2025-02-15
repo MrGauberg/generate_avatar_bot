@@ -3,12 +3,10 @@
 from aiogram import Router, types
 from aiogram.filters import Command
 from bot.keyboards.inline import start_keyboard
-from bot.handlers.avatar import avatar_callback_handler
 from bot.handlers.generation import generate_menu_callback
 from bot.handlers.god_mode import god_mode_menu_callback
 from bot.handlers.settings import settings_menu_callback
 from bot.handlers.support import support_callback_handler
-from bot.handlers.profile import profile_menu_callback
 
 from bot.utils.logger import logger
 from bot.services.api_client import api_client
