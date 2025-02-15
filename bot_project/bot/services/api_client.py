@@ -87,16 +87,21 @@ class APIClient:
 
     # Методы API
 
-    async def upload_avatar(self, files: List[Tuple[str, Tuple[str, bytes, str]]], gender: str) -> Any:
-        """Загрузка аватара"""
+    async def create_avatar(self, files: List[Tuple[str, Tuple[str, bytes, str]]], gender: str) -> Any:
+        """Загрузка фотографий для создания аватара"""
         url = f"{self.base_api_url}/avatars/upload/"
         data = {"gender": gender}
         return await self._make_request("POST", url, data, files)
 
-    async def get_user_avatars(self) -> Any:
+    async def get_user_avatars(self, user_tg_id) -> Any:
         """Получение списка аватаров"""
-        url = f"{self.base_api_url}/avatars/"
+        url = f"{self.base_api_url}/avatars/{user_tg_id}/"
         return await self._make_request("GET", url)
+    
+    async def activate_avatar(self, avatar_id) -> Any:
+        """Получение списка аватаров"""
+        url = f"{self.base_api_url}/avatars/{avatar_id}/activate/"
+        return await self._make_request("PATCH", url)
 
     async def get_styles_list(self) -> Any:
         """Получение списка стилей"""

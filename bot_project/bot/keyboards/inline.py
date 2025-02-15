@@ -108,3 +108,46 @@ def pay_keyboard(payment_url):
     """Клавиатура для оплаты"""
     button = InlineKeyboardButton(text="💳 Оплатить", url=payment_url)
     return InlineKeyboardMarkup(inline_keyboard=[[button]])
+
+
+def avatar_menu_keyboard():
+    """Клавиатура выбора аватара"""
+    buttons = [
+        [InlineKeyboardButton(text="🖼 Выбрать аватар", callback_data="avatar_select")],
+        [InlineKeyboardButton(text="➕ Добавить аватар", callback_data="avatar_add")]
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+
+def get_avatar_slider_keyboard(avatars, page=0):
+    """Создает inline-клавиатуру с аватарами (слайдер по 3 штуки)"""
+    buttons = []
+    avatars_per_page = 3
+    start_index = page * avatars_per_page
+    end_index = start_index + avatars_per_page
+    paged_avatars = avatars[start_index:end_index]
+
+    for avatar in paged_avatars:
+        buttons.append([InlineKeyboardButton(text=f"🖼 {avatar['name']}", callback_data=f"avatar_{avatar['id']}")])
+
+    nav_buttons = []
+    if start_index > 0:
+        nav_buttons.append(InlineKeyboardButton(text="⬅ Назад", callback_data=f"avatar_page_{page - 1}"))
+    if end_index < len(avatars):
+        nav_buttons.append(InlineKeyboardButton(text="Вперед ➡", callback_data=f"avatar_page_{page + 1}"))
+
+    if nav_buttons:
+        buttons.append(nav_buttons)
+
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+
+def add_avatar_keyboard():
+    """Клавиатура для покупки нового аватара"""
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="💳 Купить", callback_data="avatar_buy")],
+            [InlineKeyboardButton(text="📞 Поддержка", callback_data="menu_support")]
+        ]
+    )
+

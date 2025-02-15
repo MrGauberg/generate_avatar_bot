@@ -3,7 +3,7 @@
 from aiogram import Router, types, Bot
 from bot.services.api_client import api_client
 from bot.config import Settings
-from bot.keyboards.inline import gender_selection_keyboard
+from bot.keyboards.inline import add_avatar_keyboard, avatar_menu_keyboard, gender_selection_keyboard, get_avatar_slider_keyboard
 import tempfile
 import os
 import logging
@@ -83,7 +83,7 @@ async def handle_gender_choice(callback: types.CallbackQuery, bot: Bot):
         print("Файлы, отправляемые в API:", len(files))
 
         # Отправляем файлы в API
-        response = await api_client.upload_avatar(files=files, gender=gender)
+        response = await api_client.create_avatar(files=files, gender=gender)
         avatar_id = response.get("avatar_id")
 
         if avatar_id:
@@ -103,4 +103,102 @@ async def handle_gender_choice(callback: types.CallbackQuery, bot: Bot):
 
     # Очищаем временные данные
     del user_photos[user_id]
+    await callback.answer()
+
+
+@router.message(lambda message: message.text == "🖼 Аватар")
+async def avatar_button_handler(message: types.Message):
+    """Обработка кнопки 'Аватар'"""
+    await message.answer(
+        "👤 Здесь ты можешь выбрать человека, с лицом которого генерируются фотографии.",
+        reply_markup=avatar_menu_keyboard()
+    )
+
+
+@router.callback_query(lambda c: c.data == "avatar_select")
+async def select_avatar_handler(callback: types.CallbackQuery):
+    """Обработка выбора аватара (загрузка списка из API)"""
+    await callback.message.edit_text("⏳ Загружаем список твоих аватаров...")
+
+    try:
+        avatars = await api_client.get_user_avatars(callback.from_user.id)
+        if not avatars:
+            await callback.message.edit_text("❌ У тебя пока нет аватаров. Добавь новый!")
+            return
+
+        await callback.message.edit_text("Выбери аватар:", reply_markup=get_avatar_slider_keyboard(avatars))
+    except Exception as e:
+        await callback.message.edit_text(f"❌ Ошибка при получении списка аватаров: {e}")
+
+    await callback.answer()
+
+
+@router.callback_query(lambda c: c.data.startswith("avatar_page_"))
+async def avatar_pagination_handler(callback: types.CallbackQuery):
+    """Переключение страниц аватаров"""
+    page = int(callback.data.split("_")[2])
+    avatars = await api_client.get_user_avatars(callback.from_user.id)
+
+    await callback.message.edit_text("Выбери аватар:", reply_markup=get_avatar_slider_keyboard(avatars, page))
+    await callback.answer()
+
+
+@router.callback_query(lambda c: c.data.startswith("avatar_"))
+async def activate_avatar_handler(callback: types.CallbackQuery):
+    """Активация выбранного аватара"""
+    avatar_id = int(callback.data.split("_")[1])
+
+    try:
+        response = await api_client.activate_avatar(avatar_id)
+        if response.get("success"):
+            await callback.message.edit_text(f"✅ Аватар ID {avatar_id} выбран!")
+        else:
+            await callback.message.edit_text("❌ Ошибка при выборе аватара.")
+    except Exception as e:
+        await callback.message.edit_text(f"❌ Ошибка: {e}")
+
+    await callback.answer()
+
+
+@router.callback_query(lambda c: c.data == "avatar_add")
+async def add_avatar_handler(callback: types.CallbackQuery):
+    """Обработка добавления нового аватара"""
+    await callback.message.edit_text(
+        "🔹 Ты можешь иметь сразу несколько аватаров и выбирать любой из них для генерации изображений.\n\n"
+        "💰 **Стоимость добавления нового аватара: 490₽**\n\n"
+        "Выбери действие:",
+        reply_markup=add_avatar_keyboard()
+    )
+    await callback.answer()
+
+
+@router.callback_query(lambda c: c.data == "avatar_buy")
+async def buy_avatar_handler(callback: types.CallbackQuery):
+    """Создание платежа для добавления аватара"""
+    await callback.message.edit_text("⏳ Создаем платеж на 490₽, подождите...")
+
+    try:
+        tg_user_id = callback.from_user.id
+        response = await api_client.create_payment(
+            user_id=tg_user_id,
+            email="avatar_payment@bot.com",
+            package_type_id=5,  # ID пакета для покупки аватара (нужно настроить в API)
+            message_id=callback.message.message_id,
+            telegram_id=tg_user_id
+        )
+
+        payment_url = response.get("payment_url")
+
+        if payment_url:
+            await callback.message.edit_text(
+                f"✅ Оплата создана! Перейдите по ссылке:",
+                reply_markup=InlineKeyboardMarkup(
+                    inline_keyboard=[[InlineKeyboardButton(text="💳 Оплатить", url=payment_url)]]
+                )
+            )
+        else:
+            await callback.message.edit_text("❌ Ошибка при создании платежа.")
+    except Exception as e:
+        await callback.message.edit_text(f"❌ Ошибка: {e}")
+
     await callback.answer()

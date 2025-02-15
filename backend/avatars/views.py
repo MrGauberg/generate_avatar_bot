@@ -7,6 +7,12 @@ from .models import Avatar
 from .serializers import AvatarSerializer
 from leonardo_service.services import LeonardoService
 from django.conf import settings
+from django.http import JsonResponse
+from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
+
+
+User = get_user_model()
 
 class AvatarViewSet(viewsets.ModelViewSet):
     """Вьюсет для управления аватарами пользователей"""
@@ -18,10 +24,19 @@ class AvatarViewSet(viewsets.ModelViewSet):
         """Фильтруем аватары по текущему пользователю"""
         return self.queryset.filter(user=self.request.user)
     
-    def partial_update(self, request, *args, **kwargs):
-
+    def get_user_avatars(self, request, user_tg_id):
+        user = get_object_or_404(User, telegram_id=user_tg_id)
         
-        return super().partial_update(request, *args, **kwargs)
+        avatars = self.get_queryset().filter(user=user)
+        serializer = self.get_serializer(avatars, many=True)
+        return Response(serializer.data)
+    
+    def is_active(self, request, *args, **kwargs):
+        avatar = self.get_object()
+        avatar.is_active = True
+        avatar.save()
+        Avatar.objects.exclude(id=avatar.id, user=request.user).update(is_active=False)
+        return JsonResponse({"detail": "Аватар успешно активирован"})
     
 
 
