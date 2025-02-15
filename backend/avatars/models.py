@@ -43,3 +43,18 @@ class AvatarSettings(models.Model):
 
     def __str__(self):
         return f"Стоимость аватара: {self.price}₽"
+    
+    class Meta:
+        verbose_name = 'Настройки аватара'
+        verbose_name_plural = 'Настройки аватаров'
+    
+
+class PhotoFormat(models.Model):
+    format = models.CharField(max_length=10)
+
+    def __str__(self):
+        return f"Формат: {self.format}"
+    
+    class Meta:
+        verbose_name = 'Формат фото'
+        verbose_name_plural = 'Форматы фото'

@@ -37,5 +37,12 @@ class UserViewSet(viewsets.ModelViewSet):
         instance = get_object_or_404(User, telegram_id=telegram_id)
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
+    
+    def set_photo_format(self, request, telegram_id):
+        user = get_object_or_404(User, telegram_id=telegram_id)
+        user.settings.photo_format = request.data.get('photo_format')
+        user.save()
+        serializer = self.get_serializer(user)
+        return Response(serializer.data)
 
         

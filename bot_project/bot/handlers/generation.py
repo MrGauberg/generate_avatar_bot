@@ -68,11 +68,13 @@ async def choose_package_handler(callback: types.CallbackQuery):
             [InlineKeyboardButton(text=f"📦 {pkg['name']} - {pkg['amount']}₽", callback_data=f"payment_{pkg['id']}")]
             for pkg in packages
         ]
+        buttons.append([InlineKeyboardButton(text="📞 Поддержка", callback_data="menu_support")])
         buttons.append([InlineKeyboardButton(text="🔙 Назад", callback_data="back_to_generations")])
 
         await callback.message.edit_text(
             "💰 **Выберите пакет для покупки:**",
             reply_markup=InlineKeyboardMarkup(inline_keyboard=buttons)
+            
         )
 
     except Exception as e:

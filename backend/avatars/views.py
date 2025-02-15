@@ -98,7 +98,7 @@ class CheckAvatarSlotsView(APIView):
     def get(self, request, user_tg_id):
         user = get_object_or_404(User, telegram_id=user_tg_id)
         total_avatars = user.avatars.count()
-        available_slots = user.avatars_amount_available > total_avatars
+        available_slots = user.settings.avatars_amount_available > total_avatars
         return Response({"can_add_avatar": available_slots})
 
 

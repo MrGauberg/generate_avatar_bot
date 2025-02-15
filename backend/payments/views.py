@@ -142,7 +142,7 @@ class YooKassaWebhookView(APIView):
                     user.is_authorized = True
                     package.save()
                 elif payment_type == "avatar":
-                    user.avatars_amount_available += 1
+                    user.settings.avatars_amount_available += 1
                 user.save()
 
                 # Уведомляем бота о статусе оплаты

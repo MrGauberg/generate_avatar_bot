@@ -155,3 +155,27 @@ def get_packages_keyboard():
             [InlineKeyboardButton(text="🛒 Выберите пакет", callback_data="choose_package")]
         ]
     )
+
+
+PHOTO_FORMATS = {
+    "1:1": "1x1",
+    "3:4": "3x4",
+    "9:16": "9x16",
+    "16:9": "16x9"
+}
+
+def settings_menu_keyboard():
+    """Клавиатура настроек"""
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="📏 Формат фото", callback_data="settings_photo_format")]
+        ]
+    )
+
+def photo_format_keyboard():
+    """Клавиатура выбора формата фото"""
+    buttons = [
+        [InlineKeyboardButton(text=format_option, callback_data=f"photo_format_{PHOTO_FORMATS[format_option]}")]
+        for format_option in PHOTO_FORMATS.keys()
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
