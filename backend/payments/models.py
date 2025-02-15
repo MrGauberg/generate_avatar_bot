@@ -17,6 +17,7 @@ class PaymentRecord(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2, help_text="Сумма платежа")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
+    metadata = models.JSONField(default=dict)
 
     def __str__(self):
         return f"Платеж {self.payment_id} - {self.status}"

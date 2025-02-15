@@ -101,7 +101,7 @@ class APIClient:
         return await self._make_request("GET", url)
     
     async def buy_avatart_slot(self, data):
-        url = f"{self.base_api_url}/avatars/buy-slot/"
+        url = f"{self.base_api_url}/payments/avatar/"
         return await self._make_request("POST", url, data)
 
     async def create_avatar(self, files: List[Tuple[str, Tuple[str, bytes, str]]], gender: str) -> Any:
@@ -153,7 +153,7 @@ class APIClient:
 
     async def create_payment(self, user_id: int, email: str, package_type_id: int, message_id: int, telegram_id: int) -> dict:
         """Создание платежа через ЮKassa"""
-        url = f"{self.base_api_url}/packages/yookassa-payment/create/"
+        url = f"{self.base_api_url}/payments/package/"
         data = {
             "user_id": user_id,
             "package_type_id": package_type_id,
