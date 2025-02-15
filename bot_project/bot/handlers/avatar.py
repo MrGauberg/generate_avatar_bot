@@ -171,13 +171,16 @@ async def return_to_avatar_menu(callback: types.CallbackQuery):
 @router.callback_query(lambda c: c.data == "avatar_add")
 async def add_avatar_handler(callback: types.CallbackQuery):
     """Обработка добавления нового аватара"""
+    price = await api_client.get_avatar_price()
+
     await callback.message.edit_text(
-        "🔹 Ты можешь иметь сразу несколько аватаров и выбирать любой из них для генерации изображений.\n\n"
-        "💰 **Стоимость добавления нового аватара: 490₽**\n\n"
+        f"🔹 Ты можешь иметь сразу несколько аватаров и выбирать любой из них для генерации изображений.\n\n"
+        f"💰 **Стоимость добавления нового аватара: {price:.2f}₽**\n\n"
         "Выбери действие:",
         reply_markup=add_avatar_keyboard()
     )
     await callback.answer()
+
 
 
 @router.callback_query(lambda c: c.data == "avatar_buy")

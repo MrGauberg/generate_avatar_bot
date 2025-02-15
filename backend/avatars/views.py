@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
-from .models import Avatar
+from .models import Avatar, AvatarSettings
 from .serializers import AvatarSerializer
 from leonardo_service.services import LeonardoService
 from django.conf import settings
@@ -85,3 +85,9 @@ class AvatarUploadView(APIView):
             {"avatar_id": avatar_id, "dataset_id": dataset_response["dataset_id"], "model_id": train_response["model_id"]},
             status=status.HTTP_201_CREATED
         )
+
+
+def get_avatar_price(request):
+    """Возвращает стоимость добавления аватара"""
+    settings = AvatarSettings.objects.first()
+    return JsonResponse({"price": settings.price if settings else 490.00})

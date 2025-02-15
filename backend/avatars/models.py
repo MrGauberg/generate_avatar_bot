@@ -36,3 +36,10 @@ class AvatarImage(models.Model):
     class Meta:
         verbose_name = 'Изображение аватара'
         verbose_name_plural = 'Изображения аватаров'
+
+
+class AvatarSettings(models.Model):
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=490.00)
+
+    def __str__(self):
+        return f"Стоимость аватара: {self.price}₽"

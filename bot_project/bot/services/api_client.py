@@ -85,7 +85,11 @@ class APIClient:
             else:
                 raise
 
-    # Методы API
+    async def get_avatar_price(self) -> float:
+        """Получает стоимость аватара из API"""
+        url = f"{self.base_api_url}/avatar/price/"
+        response = await self._make_request("GET", url)
+        return float(response.get("price", 490.00))
 
     async def create_avatar(self, files: List[Tuple[str, Tuple[str, bytes, str]]], gender: str) -> Any:
         """Загрузка фотографий для создания аватара"""

@@ -140,6 +140,8 @@ def get_avatar_slider_keyboard(avatars, page=0):
     nav_buttons.append(InlineKeyboardButton(text=" ", callback_data="ignore"))
     if end_index < len(avatars):
         nav_buttons.append(InlineKeyboardButton(text="Вперед ➡", callback_data=f"avatar_page_{page + 1}"))
+    else:
+        nav_buttons.append(InlineKeyboardButton(text=" ", callback_data="ignore"))
 
     if nav_buttons:
         buttons.append(nav_buttons)

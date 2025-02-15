@@ -47,7 +47,9 @@ class CreatePaymentView(APIView):
         telegram_id = request.data.get("telegram_id")
         email = request.data.get("email")
         package_type_id = request.data.get("package_type_id")
+        is_avatar = request.data.get("avatar", False)
         message_id = request.data.get("message_id")
+
 
         package_type = get_object_or_404(PackageType, id=package_type_id)
         amount = package_type.amount
@@ -66,7 +68,7 @@ class CreatePaymentView(APIView):
 
             payment_data = {
                 "amount": {"value": str(amount), "currency": "RUB"},
-                "confirmation": {"type": "redirect", "return_url": "https://your-site.com/success"},
+                "confirmation": {"type": "redirect", "return_url": f"https://t.me/{settings.ADMIN_TG}"},
                 "capture": True,
                 "description": f"Покупка генераций {package_type.name}",
                 "metadata": {
