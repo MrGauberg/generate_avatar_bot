@@ -71,7 +71,7 @@ class CreatePackagePaymentView(BasePaymentView):
 
         package = Package.objects.create(
             user=user,
-            package_type=package,
+            package_type=package_type,
             generations_remains=package.total_generations,
         )
 
