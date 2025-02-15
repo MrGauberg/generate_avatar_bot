@@ -5,6 +5,9 @@ from aiogram import Router, types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 import logging
 from bot.services.api_client import api_client
+from aiogram.fsm.context import FSMContext
+
+from bot.handlers.ukassa import PaymentState
 
 router = Router()
 
@@ -108,9 +111,10 @@ async def confirm_terms(callback: types.CallbackQuery):
 
 
 @router.callback_query(lambda c: c.data == "start_payment_email")
-async def request_email(callback: types.CallbackQuery):
+async def request_email(callback: types.CallbackQuery, state: FSMContext):
     """Запрос email перед оплатой"""
     await callback.message.edit_text(
         "📧 Введите ваш email для получения чека и подтверждения оплаты:"
     )
+    await state.set_state(PaymentState.waiting_for_email)
     await callback.answer()
