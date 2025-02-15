@@ -18,14 +18,14 @@ class CustomUser(AbstractUser):
         return self.email
 
 class UserSettings(models.Model):
-    PHOTO_FOTMATS = [
+    PHOTO_FORMATS = [
         ('1:1', '1:1'),
         ('3:4', '3:4'),
         ('9:16', '9:16'),
         ('16:9', '16:9'),
     ]
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True, related_name='settings')
-    photo_format = models.CharField(max_length=10, choices=PHOTO_FOTMATS, default='1:1')
+    photo_format = models.CharField(max_length=10, choices=PHOTO_FORMATS, default='1:1')
     avatars_amount_available = models.IntegerField(default=1)
 
 
