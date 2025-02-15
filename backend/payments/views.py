@@ -78,7 +78,7 @@ class CreatePackagePaymentView(BasePaymentView):
         payment_url = self.create_payment(
             user,
             package_type.amount,
-            f"Покупка генераций {package.name}",
+            f"Покупка генераций {package_type.name}",
             {
                 "telegram_id": telegram_id,
                 "message_id": message_id,
