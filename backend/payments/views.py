@@ -67,9 +67,9 @@ class CreatePackagePaymentView(BasePaymentView):
         user, created = User.objects.get_or_create(
             telegram_id=telegram_id, defaults={"email": email, "username": email}
         )
-        package = get_object_or_404(PackageType, id=package_type_id)
+        package_type = get_object_or_404(PackageType, id=package_type_id)
 
-        Package.objects.create(
+        package = Package.objects.create(
             user=user,
             package_type=package,
             generations_remains=package.total_generations,
