@@ -56,6 +56,8 @@ class CreatePackagePaymentView(BasePaymentView):
         package_type_id = request.data.get("package_type_id")
         message_id = request.data.get("message_id")
 
+        print(request.data)
+        
         user = get_object_or_404(User, telegram_id=telegram_id)
         package = get_object_or_404(PackageType, id=package_type_id)
 
