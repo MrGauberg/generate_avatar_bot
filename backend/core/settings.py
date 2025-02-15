@@ -25,9 +25,11 @@ INSTALLED_APPS = [
     'prompts',
     'packages',
     'avatars',
+    'payments',
     'leonardo_service',
     "django_celery_beat",
     "django_celery_results",
+    
 
 ]
 
@@ -166,3 +168,4 @@ CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "http://localhost:8080/
 
 API_URL = os.getenv("API_URL")
 ADMIN_TG = os.getenv("ADMIN_TG")
+BOT_TG = os.getenv("BOT_TG")

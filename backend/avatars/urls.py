@@ -12,5 +12,4 @@ urlpatterns = [
     path('upload/', AvatarUploadView.as_view(), name='avatar-upload'),
     path("avatar/price/", get_avatar_price, name="get_avatar_price"),
     path("check-slots/<int:user_tg_id>/", CheckAvatarSlotsView.as_view(), name="check-avatar-slots"),
-    path("buy-slot/", BuyAvatarSlotView.as_view(), name="buy-avatar-slot"),
 ]

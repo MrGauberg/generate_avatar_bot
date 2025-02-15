@@ -101,59 +101,6 @@ class CheckAvatarSlotsView(APIView):
         return Response({"can_add_avatar": available_slots})
 
 
-class BuyAvatarSlotView(APIView):
-    """Покупка нового слота для аватара"""
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request):
-        telegram_id = request.data.get("telegram_id")
-        message_id = request.data.get("message_id")
-
-        user = get_object_or_404(User, telegram_id=telegram_id)
-        avatar_price = AvatarSettings.objects.first().price
-
-        payment_id = str(uuid.uuid4())
-
-        payment_data = {
-            "amount": {"value": str(avatar_price), "currency": "RUB"},
-            "confirmation": {"type": "redirect", "return_url": f"https://t.me/{settings.ADMIN_TG}"},
-            "capture": True,
-            "description": "Покупка слота для аватара",
-            "metadata": {
-                "payment_id": payment_id,
-                "user_id": user.id,
-                "telegram_id": telegram_id,
-                "message_id": message_id
-            },
-        }
-
-        payment = Payment.create(payment_data)
-
-        return Response({"payment_url": payment.confirmation.confirmation_url}, status=201)
-
-
-class AvatarPaymentWebhookView(APIView):
-    """Обработчик вебхука ЮKassa для оплаты слота аватара"""
-
-    def post(self, request):
-        event_data = request.data
-        metadata = event_data.get("object", {}).get("metadata", {})
-        payment_id = metadata.get("payment_id")
-        user_id = metadata.get("user_id")
-        telegram_id = metadata.get("telegram_id")
-        message_id = metadata.get("message_id")
-        status_update = event_data.get("object", {}).get("status")
-
-        if status_update == "succeeded":
-            user = get_object_or_404(User, id=user_id)
-            user.avatars_amount_available += 1
-            user.save()
-
-            webhook_url = f"{settings.API_URL}/bot/payment-webhook/"
-            requests.post(webhook_url, json={"user_id": telegram_id, "message_id": message_id})
-
-        return Response({"message": "Payment status updated"}, status=200)
-
 
 def get_avatar_price(request):
     """Возвращает стоимость добавления аватара"""

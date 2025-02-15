@@ -10,6 +10,7 @@ urlpatterns = [
     path('api/prompts/', include('prompts.urls')),
     path('api/avatars/', include('avatars.urls')),
     path('api/leonardo/', include('leonardo_service.urls')),
+    path("payments/", include("payments.urls")),
 ]
 
 if settings.DEBUG:
