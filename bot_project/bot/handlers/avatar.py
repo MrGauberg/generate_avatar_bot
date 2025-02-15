@@ -173,7 +173,7 @@ async def return_to_avatar_menu(callback: types.CallbackQuery):
 async def add_avatar_handler(callback: types.CallbackQuery):
     """Проверка доступных слотов и покупка слота"""
     tg_user_id = callback.from_user.id
-    response = await api_client._make_request("GET", f"{api_client.BASE_API_URL}/avatars/check-slots/{tg_user_id}")
+    response = await api_client.check_avatar_slots(tg_user_id)
 
     if response.get("can_add_avatar"):
         await callback.message.edit_text(

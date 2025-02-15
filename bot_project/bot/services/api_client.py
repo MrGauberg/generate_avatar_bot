@@ -63,7 +63,6 @@ class APIClient:
             else:
                 response = await self.client.request(method, url, json=data, headers=headers)
 
-            print(response.json())
             return response.json()
 
         except httpx.HTTPStatusError as e:
@@ -90,6 +89,16 @@ class APIClient:
         url = f"{self.base_api_url}/avatars/avatar/price/"
         response = await self._make_request("GET", url)
         return float(response.get("price", 490.00))
+
+    async def create_avatar(self, files: List[Tuple[str, Tuple[str, bytes, str]]], gender: str) -> Any:
+        """Загрузка фотографий для создания аватара"""
+        url = f"{self.base_api_url}/avatars/upload/"
+        data = {"gender": gender}
+        return await self._make_request("POST", url, data, files)
+    
+    async def check_avatar_slots(self, tg_user_id):
+        url = f"{self.base_api_url}/avatars/avatar/price/avatars/check-slots/{tg_user_id}"
+        return await self._make_request("GET", url)
 
     async def create_avatar(self, files: List[Tuple[str, Tuple[str, bytes, str]]], gender: str) -> Any:
         """Загрузка фотографий для создания аватара"""
