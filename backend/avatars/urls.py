@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import AvatarViewSet, AvatarUploadView, CheckAvatarSlotsView, get_avatar_price
+from .views import AvatarViewSet, AvatarUploadView, BuyAvatarSlotView, CheckAvatarSlotsView, get_avatar_price
 
 router = DefaultRouter()
 router.register(r'avatars', AvatarViewSet, basename='avatar')
@@ -12,4 +12,5 @@ urlpatterns = [
     path('upload/', AvatarUploadView.as_view(), name='avatar-upload'),
     path("avatar/price/", get_avatar_price, name="get_avatar_price"),
     path("check-slots/<int:user_tg_id>/", CheckAvatarSlotsView.as_view(), name="check-avatar-slots"),
+    path("buy-slot/", BuyAvatarSlotView.as_view(), name="buy-avatar-slot"),
 ]

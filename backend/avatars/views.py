@@ -107,7 +107,6 @@ class BuyAvatarSlotView(APIView):
 
     def post(self, request):
         telegram_id = request.data.get("telegram_id")
-        email = request.data.get("email")
         message_id = request.data.get("message_id")
 
         user = get_object_or_404(User, telegram_id=telegram_id)

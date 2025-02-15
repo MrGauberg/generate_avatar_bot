@@ -97,8 +97,12 @@ class APIClient:
         return await self._make_request("POST", url, data, files)
     
     async def check_avatar_slots(self, tg_user_id):
-        url = f"{self.base_api_url}/avatars/avatar/price/avatars/check-slots/{tg_user_id}"
+        url = f"{self.base_api_url}/avatars/check-slots/{tg_user_id}"
         return await self._make_request("GET", url)
+    
+    async def buy_avatart_slot(self, data):
+        url = f"{self.base_api_url}/avatars/buy-slot/"
+        return await self._make_request("POST", url, data)
 
     async def create_avatar(self, files: List[Tuple[str, Tuple[str, bytes, str]]], gender: str) -> Any:
         """Загрузка фотографий для создания аватара"""
