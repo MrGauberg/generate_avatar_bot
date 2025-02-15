@@ -175,7 +175,7 @@ def settings_menu_keyboard():
 def photo_format_keyboard():
     """Клавиатура выбора формата фото"""
     buttons = [
-        [InlineKeyboardButton(text=format_option, callback_data=f"photo_format_{PHOTO_FORMATS[format_option]}")]
+        [InlineKeyboardButton(text=format_option, callback_data=f"set_photo_format_{PHOTO_FORMATS[format_option]}")]
         for format_option in PHOTO_FORMATS.keys()
     ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)

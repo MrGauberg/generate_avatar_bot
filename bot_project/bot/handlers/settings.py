@@ -20,20 +20,6 @@ async def settings_menu_callback(event: types.Message | types.CallbackQuery):
 
 
 
-@router.callback_query(lambda c: c.data.startswith("settings_"))
-async def handle_photo_format_selection_callback(callback: types.CallbackQuery):
-    """Обработка выбора формата фото"""
-    selected_format = callback.data.split("_")[1]
-
-    try:
-        await api_client.set_photo_format(callback.from_user.id, selected_format)
-        await callback.message.edit_text(f"✅ Формат фото установлен: {selected_format}")
-    except Exception as e:
-        await callback.message.edit_text(f"❌ Ошибка при установке формата: {e}")
-
-    await callback.answer()
-
-
 @router.message(lambda message: message.text == "⚙ Настройки")
 async def settings_button_handler(message: types.Message):
     """Обработка кнопки 'Настройки'"""
@@ -47,10 +33,10 @@ async def choose_photo_format(callback: types.CallbackQuery):
     await callback.answer()
 
 
-@router.callback_query(lambda c: c.data.startswith("photo_format_"))
+@router.callback_query(lambda c: c.data.startswith("set_photo_format_"))
 async def handle_photo_format_selection(callback: types.CallbackQuery):
     """Обработка выбора формата фото"""
-    selected_format = callback.data.split("_")[1]
+    selected_format = callback.data.split("_")[-1]  # Теперь формат передается правильно
     user_id = callback.from_user.id
 
     try:
@@ -60,3 +46,4 @@ async def handle_photo_format_selection(callback: types.CallbackQuery):
         await callback.message.edit_text(f"❌ Ошибка при установке формата: {e}")
 
     await callback.answer()
+
