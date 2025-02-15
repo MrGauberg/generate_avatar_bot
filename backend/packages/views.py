@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from yookassa import Configuration, Payment
-from .models import Package, PackageType, Payment as PaymentModel
+from .models import Package, PackageType
 from django.contrib.auth import get_user_model
 
 User = get_user_model()

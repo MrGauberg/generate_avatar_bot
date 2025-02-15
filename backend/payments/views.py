@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from yookassa import Payment, Configuration
 from django.conf import settings
-from backend.avatars.models import AvatarSettings
+from avatars.models import AvatarSettings
 from packages.models import Package, PackageType
 from users.models import CustomUser
 from payments.models import PaymentRecord

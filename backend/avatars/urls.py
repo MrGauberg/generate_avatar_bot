@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import AvatarViewSet, AvatarUploadView, BuyAvatarSlotView, CheckAvatarSlotsView, get_avatar_price
+from .views import AvatarViewSet, AvatarUploadView, CheckAvatarSlotsView, get_avatar_price
 
 router = DefaultRouter()
 router.register(r'avatars', AvatarViewSet, basename='avatar')
