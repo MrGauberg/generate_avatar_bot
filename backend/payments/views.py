@@ -8,9 +8,11 @@ from yookassa import Payment, Configuration
 from django.conf import settings
 from avatars.models import AvatarSettings
 from packages.models import Package, PackageType
-from users.models import CustomUser
 from payments.models import PaymentRecord
 from rest_framework import status
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 # Настраиваем API ЮKassa
@@ -54,7 +56,7 @@ class CreatePackagePaymentView(BasePaymentView):
         package_type_id = request.data.get("package_type_id")
         message_id = request.data.get("message_id")
 
-        user = get_object_or_404(CustomUser, telegram_id=telegram_id)
+        user = get_object_or_404(User, telegram_id=telegram_id)
         package = get_object_or_404(PackageType, id=package_type_id)
 
         payment_url = self.create_payment(
@@ -79,7 +81,7 @@ class CreateAvatarPaymentView(BasePaymentView):
         telegram_id = request.data.get("telegram_id")
         message_id = request.data.get("message_id")
 
-        user = get_object_or_404(CustomUser, telegram_id=telegram_id)
+        user = get_object_or_404(User, telegram_id=telegram_id)
         avatar_price = AvatarSettings.objects.first().price
 
         payment_url = self.create_payment(
@@ -117,7 +119,7 @@ class YooKassaWebhookView(APIView):
             payment.save()
 
             if status_update == "succeeded":
-                user = get_object_or_404(CustomUser, id=payment.user.id)
+                user = get_object_or_404(User, telegram_id=telegram_id)
 
                 if payment_type == "package":
                     package_id = metadata.get("package_id")
