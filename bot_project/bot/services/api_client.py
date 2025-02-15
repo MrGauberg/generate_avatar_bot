@@ -85,7 +85,7 @@ class APIClient:
                 raise
 
     async def set_photo_format(self, user_id: int, photo_format: str) -> Any:
-        url = f"{self.base_api_url}/users/{user_id}/set_photo_format/"
+        url = f"{self.base_api_url}/users/set_photo_format/{user_id}/"
         return await self._make_request("POST", url, {"photo_format": photo_format})
 
     async def get_avatar_price(self) -> float:
