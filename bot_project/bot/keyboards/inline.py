@@ -54,22 +54,6 @@ def profile_keyboard():
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
 
-PHOTO_FORMATS = {
-    "1:1": "1:1",
-    "3:4": "3:4",
-    "9:16": "9:16",
-    "16:9": "16:9"
-}
-
-def settings_keyboard():
-    """Клавиатура выбора формата фото"""
-    buttons = [
-        [InlineKeyboardButton(text=format_option, callback_data=f"settings_{PHOTO_FORMATS[format_option]}")]
-        for format_option in PHOTO_FORMATS.keys()
-    ]
-    return InlineKeyboardMarkup(inline_keyboard=buttons)
-
-
 
 def support_keyboard():
     """Клавиатура поддержки"""
@@ -158,10 +142,10 @@ def get_packages_keyboard():
 
 
 PHOTO_FORMATS = {
-    "1:1": "1x1",
-    "3:4": "3x4",
-    "9:16": "9x16",
-    "16:9": "16x9"
+    "1:1": "1:1",
+    "3:4": "3:4",
+    "9:16": "9:16",
+    "16:9": "16:9"
 }
 
 def settings_menu_keyboard():
