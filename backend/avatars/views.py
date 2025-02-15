@@ -20,10 +20,6 @@ class AvatarViewSet(viewsets.ModelViewSet):
     serializer_class = AvatarSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        """Фильтруем аватары по текущему пользователю"""
-        return self.queryset.filter(user=self.request.user)
-    
     def get_user_avatars(self, request, user_tg_id):
         user = get_object_or_404(User, telegram_id=user_tg_id)
         
