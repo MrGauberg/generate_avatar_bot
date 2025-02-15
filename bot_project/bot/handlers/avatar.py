@@ -143,15 +143,16 @@ async def avatar_pagination_handler(callback: types.CallbackQuery):
     await callback.answer()
 
 
-@router.callback_query(lambda c: c.data.startswith("avatar_"))
+@router.callback_query(lambda c: c.data.startswith("avatar_select"))
 async def activate_avatar_handler(callback: types.CallbackQuery):
     """Активация выбранного аватара"""
-    avatar_id = int(callback.data.split("_")[1])
+    avatar_id = int(callback.data.split("_")[2])
+    avatar_name = callback.data.split("_")[3]
 
     try:
         response = await api_client.activate_avatar(avatar_id)
-        if response.get("success"):
-            await callback.message.edit_text(f"✅ Аватар ID {avatar_id} выбран!")
+        if not response.get("error"):
+            await callback.message.edit_text(f"✅ Аватар {avatar_name} выбран!")
         else:
             await callback.message.edit_text("❌ Ошибка при выборе аватара.")
     except Exception as e:
@@ -159,6 +160,14 @@ async def activate_avatar_handler(callback: types.CallbackQuery):
 
     await callback.answer()
 
+@router.callback_query(lambda c: c.data == "avatar_menu")
+async def return_to_avatar_menu(callback: types.CallbackQuery):
+    """Возвращение в меню аватаров"""
+    await callback.message.edit_text(
+        "👤 Здесь ты можешь выбрать человека, с лицом которого генерируются фотографии.",
+        reply_markup=avatar_menu_keyboard()
+    )
+    await callback.answer() 
 
 @router.callback_query(lambda c: c.data == "avatar_add")
 async def add_avatar_handler(callback: types.CallbackQuery):

@@ -128,18 +128,23 @@ def get_avatar_slider_keyboard(avatars, page=0):
     paged_avatars = avatars[start_index:end_index]
 
     for avatar in paged_avatars:
-        buttons.append([InlineKeyboardButton(text=f"🖼 {avatar['name']}", callback_data=f"avatar_{avatar['id']}")])
+        active = " ✅" if avatar.get("is_active", False) else ""
+        buttons.append([InlineKeyboardButton(text=f"🖼 {avatar['name']}{active}", callback_data=f"avatar_select_{avatar['id']}")])
 
     nav_buttons = []
     if start_index > 0:
         nav_buttons.append(InlineKeyboardButton(text="⬅ Назад", callback_data=f"avatar_page_{page - 1}"))
+    nav_buttons.append(InlineKeyboardButton(text=" ", callback_data="ignore"))
     if end_index < len(avatars):
         nav_buttons.append(InlineKeyboardButton(text="Вперед ➡", callback_data=f"avatar_page_{page + 1}"))
 
     if nav_buttons:
         buttons.append(nav_buttons)
 
+    buttons.append([InlineKeyboardButton(text="🔙 В меню аватаров", callback_data="avatar_menu")])
+
     return InlineKeyboardMarkup(inline_keyboard=buttons)
+
 
 
 def add_avatar_keyboard():

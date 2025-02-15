@@ -59,12 +59,6 @@ async def god_mode_button_handler(message: types.Message):
     await god_mode_menu_callback(message)
 
 
-@router.message(lambda message: message.text == "🖼 Аватар")
-async def avatar_button_handler(message: types.Message):
-    """Обработка кнопки 'Аватар'"""
-    await avatar_callback_handler(message)
-
-
 @router.message(lambda message: message.text == "💰 Генерации")
 async def generations_button_handler(message: types.Message):
     """Обработка кнопки 'Генерации'"""
