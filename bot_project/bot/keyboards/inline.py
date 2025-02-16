@@ -5,14 +5,13 @@ from bot.config import Settings
 from bot.services.api_client import api_client
 
 
-async def gender_selection_keyboard():
-    """Динамическая клавиатура выбора пола"""
-    genders = await api_client.get_avatar_genders()
+
+def gender_selection_keyboard(genders: dict) -> InlineKeyboardMarkup:
+    """Создает клавиатуру выбора пола на основе полученных данных из API"""
     buttons = [[InlineKeyboardButton(text=f"👤 {name}", callback_data=f"avatar_gender_{gender_id}")]
                for gender_id, name in genders.items()]
 
     return InlineKeyboardMarkup(inline_keyboard=buttons)
-
 
 
 def get_categories_keyboard(categories):
