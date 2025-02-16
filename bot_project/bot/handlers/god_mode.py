@@ -1,6 +1,9 @@
 # bot/handlers/god_mode.py
 
 from aiogram import Router, types
+
+from aiogram.filters import StateFilter
+
 from bot.services.api_client import api_client
 from bot.keyboards.inline import god_mode_keyboard, god_mode_instruction_keyboard
 
@@ -86,9 +89,10 @@ async def toggle_god_mode_callback(callback: types.CallbackQuery):
     await callback.answer()
 
 
-@router.message(lambda message: message.text)
+@router.message(StateFilter(None), lambda message: message.text)
 async def generate_image_in_god_mode(message: types.Message):
-    """Генерация изображения по текстовому описанию в режиме 'Бога'"""
+    """Генерация изображения по текстовому описанию в режиме 'Бога' (если бот не ждет других данных)"""
+    
     user_id = message.from_user.id
     user_data = await api_client.get_user_profile(user_id)
     is_god_mode_enabled = user_data.get("god_mode", False)
@@ -106,3 +110,4 @@ async def generate_image_in_god_mode(message: types.Message):
             await message.answer("❌ Ошибка генерации изображения.")
     except Exception as e:
         await message.answer(f"❌ Ошибка: {e}")
+
