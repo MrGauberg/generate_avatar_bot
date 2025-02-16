@@ -18,9 +18,11 @@ async def generations_button_handler(event: types.Message | types.CallbackQuery)
 
     if isinstance(event, types.Message):
         message = event
+        is_callback = False
     else:
         message = event.message
-        
+        is_callback = True
+
     user_id = message.from_user.id
 
     await message.answer("⏳ Получаем информацию о ваших генерациях...")
@@ -43,16 +45,21 @@ async def generations_button_handler(event: types.Message | types.CallbackQuery)
 
         total_generations = sum(pkg.get("generations_remains", 0) for pkg in user_packages)
 
-        await message.answer(
+        text = (
             f"💰 **Ваши генерации**\n\n"
             f"📊 Общее количество доступных генераций: **{total_generations}**\n\n"
             f"{packages_text}\n\n"
-            "🔹 Если генерации закончились, выберите новый пакет ниже:",
-            reply_markup=get_packages_keyboard()
+            "🔹 Если генерации закончились, выберите новый пакет ниже:"
         )
+
+        if is_callback:
+            await message.edit_text(text, reply_markup=get_packages_keyboard())
+        else:
+            await message.answer(text, reply_markup=get_packages_keyboard())
 
     except Exception as e:
         await message.answer(f"❌ Ошибка при получении данных: {e}")
+
 
 
 
