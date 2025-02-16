@@ -236,7 +236,7 @@ def get_styles_slider(styles, page=0):
 
     if len(styles) > styles_per_page:
         nav_buttons.append(InlineKeyboardButton(text=" ", callback_data="ignore"))
-        
+
     if end_index < len(styles):
         nav_buttons.append(InlineKeyboardButton(text="Вперед ➡", callback_data=f"style_page_{page + 1}_{category_id}"))
     else:
@@ -245,5 +245,6 @@ def get_styles_slider(styles, page=0):
 
     if nav_buttons:
         buttons.append(nav_buttons)
+    buttons.append([InlineKeyboardButton(text="🔙 Назад к категориям", callback_data="back_to_categories")])
 
     return InlineKeyboardMarkup(inline_keyboard=buttons)

@@ -70,3 +70,12 @@ async def style_selected(callback: types.CallbackQuery):
         await callback.message.answer(f"❌ Ошибка: {e}")
 
     await callback.answer()
+
+
+@router.callback_query(lambda c: c.data == "back_to_categories")
+async def back_to_categories_handler(callback: types.CallbackQuery):
+    """Возвращение к списку категорий"""
+    categories = await api_client.get_categories_list()
+    await callback.message.edit_text("📂 Выберите категорию:", reply_markup=get_categories_slider(categories))
+    await callback.answer()
+
