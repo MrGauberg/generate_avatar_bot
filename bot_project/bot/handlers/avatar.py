@@ -23,14 +23,6 @@ router = Router()
 
 MAX_PHOTOS = Settings.service.IMAGES_COUNT
 
-# Храним загруженные фото временно (можно заменить на БД)
-user_photos = {}
-GENDER_CHOICES = {
-    "avatar_gender_male": "male",
-    "avatar_gender_female": "female",
-    "avatar_gender_child": "child",
-}
-
 
 @router.callback_query(lambda c: c.data == "menu_create_avatar")
 async def avatar_callback_handler(callback: types.CallbackQuery):
@@ -51,35 +43,35 @@ async def handle_photo_upload(message: types.Message):
     """Обработка загруженных фотографий"""
     user_id = message.from_user.id
 
-    user_state = await redis_client.get_user_state(user_id)
+    async with redis_client.lock(f"user_lock:{user_id}"):
+        user_state = await redis_client.get_user_state(user_id)
+        if user_state != "waiting_for_photos":
+            await message.answer("⚠ Сейчас загрузка фото не требуется. Начните создание аватара заново.")
+            return
 
-    if user_state != "waiting_for_photos":
-        await message.answer("⚠ Сейчас загрузка фото не требуется. Начните создание аватара заново.")
-        return
-    
-    photos = await redis_client.get_photos(user_id)
-    if len(photos) >= MAX_PHOTOS:
-        await message.answer("⚠ Вы уже загрузили достаточное количество фото!")
-        return
+        photos = await redis_client.get_photos(user_id)
+        if len(photos) >= MAX_PHOTOS:
+            await message.answer("⚠ Вы уже загрузили достаточное количество фото!")
+            return
 
-    # Берем ТОЛЬКО самое большое фото
-    largest_photo = message.photo[-1].file_id
-    await redis_client.save_photo(user_id, largest_photo)
+        # Берем ТОЛЬКО самое большое фото
+        largest_photo = message.photo[-1].file_id
+        await redis_client.save_photo(user_id, largest_photo)
 
-    photos = await redis_client.get_photos(user_id)
-    uploaded_count = len(photos)
+        # Обновляем список фото и считаем их количество
+        photos = await redis_client.get_photos(user_id)
+        uploaded_count = len(photos)
 
-    if uploaded_count < MAX_PHOTOS:
-        await message.answer(f"📷 Принято! Загружено {uploaded_count}/{MAX_PHOTOS} фото.")
-    else:
-        # Получаем список полов из API один раз
-        genders = await api_client.get_avatar_genders()
-        
-        await redis_client.set_user_state(user_id, "waiting_for_gender")
-        await message.answer(
-            "✅ Все фото загружены!\nВыберите пол аватара:",
-            reply_markup=gender_selection_keyboard(genders),
-        )
+        if uploaded_count == MAX_PHOTOS:
+            await redis_client.set_user_state(user_id, "waiting_for_gender")
+            genders = await api_client.get_avatar_genders()
+            await message.answer(
+                "✅ Все фото загружены!\nВыберите пол аватара:",
+                reply_markup=gender_selection_keyboard(genders),
+            )
+        else:
+            await message.answer(f"📷 Принято! Загружено {uploaded_count}/{MAX_PHOTOS} фото.")
+
 
 
 

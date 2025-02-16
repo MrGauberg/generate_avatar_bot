@@ -60,6 +60,15 @@ class RedisClient:
         key = f"user:{user_id}:is_authorized"
         result = await self.redis.get(key)
         return bool(int(result)) if result is not None else False
+    
+    def lock(self, name: str, timeout: int = 10, sleep: float = 0.1, blocking: bool = True, blocking_timeout: float | None = None):
+        """
+        Возвращает объект блокировки для использования через async with.
+        Пример использования:
+            async with redis_client.lock(f"user_lock:{user_id}"):
+                # критическая секция
+        """
+        return self.redis.lock(name, timeout=timeout, sleep=sleep, blocking=blocking, blocking_timeout=blocking_timeout)
 
     
 redis_client = RedisClient()
