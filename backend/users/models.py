@@ -27,6 +27,7 @@ class UserSettings(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True, related_name='settings')
     photo_format = models.CharField(max_length=10, choices=PHOTO_FORMATS, default='1:1')
     avatars_amount_available = models.IntegerField(default=1)
+    god_mode = models.BooleanField(default=False)
 
 
     def __str__(self):

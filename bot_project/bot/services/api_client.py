@@ -87,6 +87,10 @@ class APIClient:
     async def set_photo_format(self, user_id: int, photo_format: str) -> Any:
         url = f"{self.base_api_url}/users/set_photo_format/{user_id}/"
         return await self._make_request("POST", url, {"photo_format": photo_format})
+    
+    async def set_god_mode(self, user_id: int, god_mode: bool) -> Any:
+        url = f"{self.base_api_url}/users/set_god_mode/{user_id}/"
+        return await self._make_request("POST", url, {"god_mode": god_mode})
 
     async def get_avatar_price(self) -> float:
         """Получает стоимость аватара из API"""

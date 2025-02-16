@@ -17,9 +17,9 @@ class CustomUserAdmin(UserAdmin):
 
 @admin.register(UserSettings)
 class UserSettingsAdmin(admin.ModelAdmin):
-    list_display = ('user', 'get_email', 'photo_format', 'avatars_amount_available')
+    list_display = ('user', 'get_email', 'photo_format', 'avatars_amount_available', 'god_mode')
     search_fields = ('user__username', 'photo_format')
-    list_editable = ('photo_format', 'avatars_amount_available')
+    list_editable = ('photo_format', 'avatars_amount_available', 'god_mode')
 
     def get_email(self, obj):
         return obj.user.email

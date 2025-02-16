@@ -45,5 +45,13 @@ class UserViewSet(viewsets.ModelViewSet):
         user.save()
         serializer = self.get_serializer(user)
         return Response(serializer.data)
+    
+    def set_god_mode(self, request, telegram_id):
+        user = get_object_or_404(User, telegram_id=telegram_id)
+        user.settings.god_mode = request.data.get('god_mode')
+        user.settings.save()
+        user.save()
+        serializer = self.get_serializer(user)
+        return Response(serializer.data)
 
         

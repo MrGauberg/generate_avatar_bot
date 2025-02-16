@@ -14,10 +14,11 @@ class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
     photo_format = serializers.CharField(source='settings.photo_format')
     avatars_amount_available = serializers.IntegerField(source='settings.avatars_amount_available')
+    god_mode = serializers.BooleanField(source='settings.god_mode')
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'password', 'telegram_id', 'photo_format', 'avatars_amount_available', 'is_authorized', 'is_active')
+        fields = ('id', 'username', 'email', 'password', 'telegram_id', 'photo_format', 'avatars_amount_available', 'is_authorized', 'is_active', 'god_mode')
 
     def create(self, validated_data):
         user = User.objects.create(
