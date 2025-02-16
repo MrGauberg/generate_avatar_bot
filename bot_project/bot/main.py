@@ -20,7 +20,7 @@ from bot.handlers.webhooks import handle_payment_webhook
 from aiogram.fsm.storage.redis import RedisStorage
 from aiohttp import web
 
-import redis.asyncio as redis
+from bot.services.redis_client import redis_client
 
 
 # Настраиваем логирование
@@ -29,6 +29,8 @@ logging.basicConfig(level=logging.INFO)
 
 # Инициализируем бота
 bot = Bot(token=Settings.bot.TOKEN)
+
+
 dp: Dispatcher | None = None
 
 
@@ -36,9 +38,6 @@ async def create_dispatcher():
     """Создает и возвращает диспетчер с Redis-хранилищем"""
     global dp
     if dp is None:
-        redis_host = Settings.redis.host
-        redis_port = Settings.redis.port
-        redis_client = redis.Redis(host=redis_host, port=redis_port, decode_responses=True)
         storage = RedisStorage(redis_client)
         dp = Dispatcher(storage=storage)
     return dp

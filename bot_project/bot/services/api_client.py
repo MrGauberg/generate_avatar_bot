@@ -21,10 +21,6 @@ class APIClient:
     async def authenticate(self, email: str, password: str) -> None:
         """Авторизация и получение токенов"""
         url = f"{self.base_api_url}/users/token/"
-
-        print(f"🔹 Отправляем запрос на {url}")
-        print(f"📧 Email: {email}")
-        print(f"🔑 Пароль: {password}")  # Маскируем пароль в логах
         try:
             response = await self.client.post(url, json={"email": email, "password": password})
             response.raise_for_status()

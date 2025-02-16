@@ -14,8 +14,9 @@ import os
 import logging
 import aiofiles
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
+
+from bot.services.redis_client import redis_client
 
 router = Router()
 
@@ -29,47 +30,75 @@ GENDER_CHOICES = {
     "avatar_gender_child": "child",
 }
 
-allowed_users = set()
+async def set_user_state(user_id, state):
+    """Устанавливает состояние пользователя в Redis"""
+    key = f"user:{user_id}:state"
+    await redis_client.set(key, state)
 
-class AvatarState(StatesGroup):
-    waiting_for_photos = State()
+async def get_user_state(user_id):
+    """Получает текущее состояние пользователя"""
+    key = f"user:{user_id}:state"
+    return await redis_client.get(key)
 
+async def save_photo_to_redis(user_id, photo_id):
+    """Сохранение фото в Redis"""
+    key = f"user:{user_id}:photos"
+    await redis_client.rpush(key, photo_id)
+
+
+async def get_photos_from_redis(user_id):
+    """Получение списка загруженных фото"""
+    key = f"user:{user_id}:photos"
+    return await redis_client.lrange(key, 0, -1)
+
+
+async def clear_photos_from_redis(user_id):
+    """Очистка загруженных фото"""
+    key = f"user:{user_id}:photos"
+    await redis_client.delete(key)
+
+async def set_user_state(user_id, state):
+    """Устанавливает состояние пользователя в Redis"""
+    key = f"user:{user_id}:state"
+    await redis_client.set(key, state)
 
 @router.callback_query(lambda c: c.data == "menu_create_avatar")
-async def avatar_callback_handler(callback: types.CallbackQuery, state: FSMContext):
+async def avatar_callback_handler(callback: types.CallbackQuery):
     """Обработка нажатия кнопки 'Создать аватар'"""
-
-    await state.set_state(AvatarState.waiting_for_photos)
+    await clear_photos_from_redis(callback.from_user.id)
+    user_id = callback.from_user.id
+    await set_user_state(user_id, "waiting_for_photos")
 
     await callback.message.edit_text(
         f"📸 Отправьте мне {MAX_PHOTOS} фотографий для создания аватара.\n"
         "Фотографии должны быть разными и хорошо освещенными!"
     )
-    user_photos[callback.from_user.id] = []
     await callback.answer()
 
 
 @router.message(lambda message: message.photo)
-async def handle_photo_upload(message: types.Message, state: FSMContext):
-    """Обработка загруженных фотографий (исправление дублирования)"""
+async def handle_photo_upload(message: types.Message):
+    """Обработка загруженных фотографий"""
     user_id = message.from_user.id
 
-    current_state = await state.get_state()
-    if current_state != AvatarState.waiting_for_photos:
-        await message.answer("⚠ Сначала запросите создание аватара через меню!")
-        return
+    user_state = await get_user_state(user_id)
 
-    if user_id not in user_photos:
-        user_photos[user_id] = []
+    if user_state != "waiting_for_photos":
+        await message.answer("⚠ Сейчас загрузка фото не требуется. Начните создание аватара заново.")
+        return
+    
+    photos = await get_photos_from_redis(user_id)
+    if len(photos) >= MAX_PHOTOS:
+        await message.answer("⚠ Вы уже загрузили достаточное количество фото!")
+        return
 
     # Берем ТОЛЬКО самое большое фото
     largest_photo = message.photo[-1].file_id
+    await save_photo_to_redis(user_id, largest_photo)
 
-    if len(user_photos[user_id]) < MAX_PHOTOS:
-        user_photos[user_id].append(largest_photo)
+    photos = await get_photos_from_redis(user_id)
+    uploaded_count = len(photos)
 
-    # Сообщаем о количестве загруженных фото
-    uploaded_count = len(user_photos[user_id])
     if uploaded_count < MAX_PHOTOS:
         await message.answer(f"📷 Принято! Загружено {uploaded_count}/{MAX_PHOTOS} фото.")
     else:
@@ -77,8 +106,6 @@ async def handle_photo_upload(message: types.Message, state: FSMContext):
             "✅ Все фото загружены!\nВыберите пол аватара:",
             reply_markup=gender_selection_keyboard(),
         )
-        allowed_users.discard(user_id)  # Запрещаем загрузку после 10 фото
-
 
 
 @router.callback_query(lambda c: c.data in GENDER_CHOICES)
@@ -87,7 +114,9 @@ async def handle_gender_choice(callback: types.CallbackQuery, bot: Bot):
     user_id = callback.from_user.id
     gender = GENDER_CHOICES[callback.data]
 
-    if user_id not in user_photos or len(user_photos[user_id]) < MAX_PHOTOS:
+    photos = await get_photos_from_redis(user_id)
+
+    if len(photos) < MAX_PHOTOS:
         await callback.message.edit_text(
             f"⚠ Пожалуйста, сначала загрузите {MAX_PHOTOS} фото!"
         )
@@ -100,21 +129,18 @@ async def handle_gender_choice(callback: types.CallbackQuery, bot: Bot):
     temp_files = []  # Список для хранения путей временных файлов
 
     try:
-        for i, photo_id in enumerate(user_photos[user_id]):
+        for i, photo_id in enumerate(photos):
             temp_file_path = os.path.join(tempfile.gettempdir(), f"photo_{i}.jpg")
 
-            # Скачиваем фото В ФАЙЛ, а не в поток
+            # Скачиваем фото
             await bot.download(photo_id, destination=temp_file_path)
-
             temp_files.append(temp_file_path)
 
             # Читаем содержимое и добавляем в список файлов для API
             async with aiofiles.open(temp_file_path, "rb") as temp_file:
                 file_data = await temp_file.read()
                 if file_data:
-                    files.append(
-                        ("images", (f"photo_{i}.jpg", file_data, "image/jpeg"))
-                    )
+                    files.append(("images", (f"photo_{i}.jpg", file_data, "image/jpeg")))
 
         # Отправляем файлы в API
         response = await api_client.create_avatar(files=files, gender=gender, tg_user_id=user_id)
@@ -124,6 +150,7 @@ async def handle_gender_choice(callback: types.CallbackQuery, bot: Bot):
             await callback.message.edit_text(f"🎉 Аватар создан! ID: {avatar_id}")
         else:
             await callback.message.edit_text("❌ Ошибка при создании аватара.")
+
     except Exception as e:
         logging.error(f"Ошибка загрузки аватара: {e}")
         await callback.message.edit_text(f"❌ Ошибка: {e}")
@@ -135,8 +162,9 @@ async def handle_gender_choice(callback: types.CallbackQuery, bot: Bot):
             except Exception as e:
                 logging.warning(f"Не удалось удалить файл {temp_file_path}: {e}")
 
-    # Очищаем временные данные
-    del user_photos[user_id]
+        # Очищаем временные данные из Redis
+        await clear_photos_from_redis(user_id)
+
     await callback.answer()
 
 
@@ -225,7 +253,7 @@ async def add_avatar_handler(callback: types.CallbackQuery, state: FSMContext):
         await callback.message.edit_text(
             "📸 У вас есть свободный слот! Приступаем к созданию аватара."
         )
-        await avatar_callback_handler(callback, state)
+        await avatar_callback_handler(callback)
     else:
         price = await api_client.get_avatar_price()
         await callback.message.edit_text(
