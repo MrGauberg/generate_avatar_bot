@@ -3,12 +3,14 @@
 from aiogram import Router, types
 from bot.services.api_client import api_client
 from bot.keyboards.inline import photo_format_keyboard, settings_menu_keyboard
+from bot.utils.auth import require_authorization
 
 router = Router()
 
 
 @router.callback_query(lambda c: c.data == "menu_settings")
 @router.message(lambda message: message.text == "⚙ Настройки")
+@require_authorization
 async def settings_menu_callback(event: types.Message | types.CallbackQuery):
     """Обработчик кнопки 'Настройки'"""
     if isinstance(event, types.CallbackQuery):

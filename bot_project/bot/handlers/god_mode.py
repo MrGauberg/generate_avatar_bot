@@ -6,6 +6,7 @@ from aiogram.filters import StateFilter
 
 from bot.services.api_client import api_client
 from bot.keyboards.inline import god_mode_keyboard, god_mode_instruction_keyboard
+from bot.utils.auth import require_authorization
 
 router = Router()
 
@@ -13,6 +14,7 @@ router = Router()
 
 @router.callback_query(lambda c: c.data == "menu_god_mode")
 @router.message(lambda message: message.text == "🔮 Режим Бога")
+@require_authorization
 async def god_mode_menu(event: types.Message | types.CallbackQuery):
     """Обработчик кнопки 'Режим Бога'"""
     user_id = event.from_user.id

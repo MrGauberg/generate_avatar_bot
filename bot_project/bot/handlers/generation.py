@@ -5,12 +5,14 @@ from bot.services.api_client import api_client
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from bot.keyboards.inline import get_categories_keyboard, get_styles_keyboard
 from bot.keyboards.inline import get_packages_keyboard
+from bot.utils.auth import require_authorization
 
 router = Router()
 
 
 @router.message(lambda message: message.text == "💰 Генерации")
 @router.callback_query(lambda c: c.data == "show_generations")
+@require_authorization
 async def generations_button_handler(event: types.Message | types.CallbackQuery):
     """Обработка кнопки 'Генерации'"""
     user_id = event.from_user.id

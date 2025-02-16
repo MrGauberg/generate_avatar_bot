@@ -4,6 +4,7 @@ from aiogram import Router, types
 from aiogram.filters import Command
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from bot.services.api_client import api_client
+from bot.utils.auth import require_authorization
 
 router = Router()
 
