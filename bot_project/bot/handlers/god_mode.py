@@ -8,18 +8,27 @@ router = Router()
 
 
 
+@router.callback_query(lambda c: c.data == "menu_god_mode")
 @router.message(lambda message: message.text == "🔮 Режим Бога")
-async def god_mode_button_handler(message: types.Message):
-    """Обработка кнопки 'Режим Бога'"""
-    user_id = message.from_user.id
+async def god_mode_menu(event: types.Message | types.CallbackQuery):
+    """Обработчик кнопки 'Режим Бога'"""
+    user_id = event.from_user.id
     user_data = await api_client.get_user_profile(user_id)
     is_god_mode_enabled = user_data.get("god_mode", False)
 
-    await message.answer(
-        "🔮 **Режим Бога**\n\n"
-        "Этот режим позволяет генерировать изображения по текстовому описанию.",
-        reply_markup=god_mode_keyboard(is_god_mode_enabled)
-    )
+    if isinstance(event, types.CallbackQuery):
+        await event.message.edit_text(
+            "🔮 **Режим Бога**\n\n"
+            "Этот режим позволяет генерировать изображения по текстовому описанию.",
+            reply_markup=god_mode_keyboard(is_god_mode_enabled)
+        )
+    else:
+        await event.answer(
+            "🔮 **Режим Бога**\n\n"
+            "Этот режим позволяет генерировать изображения по текстовому описанию.",
+            reply_markup=god_mode_keyboard(is_god_mode_enabled)
+        )
+
 
 
 @router.callback_query(lambda c: c.data == "godmode_menu")
