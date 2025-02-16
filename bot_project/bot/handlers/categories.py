@@ -20,13 +20,10 @@ async def styles_button_handler(message: types.Message):
 async def category_selected(callback: types.CallbackQuery):
     """Обработка выбора категории"""
     category_id = callback.data.split("_")[1]
-    category_id = None if category_id == "None" else int(category_id)
+    category_id = None if category_id == "0" else int(category_id)
+    category_name = callback.data.split("_")[2]
 
     styles = await api_client.get_styles_list(category_id)
-
-    category_name = "Без категории" if category_id is None else next(
-        (c["name"] for c in await api_client.get_categories_list() if c["id"] == category_id), "Неизвестная категория"
-    )
 
     await callback.message.edit_text(
         f"📂 **Категория: {category_name}**\n\nВыбери стиль и получи 2 фото:",

@@ -179,7 +179,7 @@ def god_mode_instruction_keyboard():
 
 def get_categories_slider(categories, page=0):
     """Создает inline-клавиатуру с категориями (слайдер по 3 штуки)"""
-    categories.insert(0, {"id": None, "name": "Без категории"}) 
+    categories.insert(0, {"id": 0, "name": "Без категории"}) 
 
     buttons = []
     categories_per_page = 3
@@ -188,8 +188,10 @@ def get_categories_slider(categories, page=0):
     paged_categories = categories[start_index:end_index]
 
     for category in paged_categories:
+        category_name = category["name"]
+        category_id = category["id"]
         buttons.append([
-            InlineKeyboardButton(text=category["name"], callback_data=f"category_{category['id']}")
+            InlineKeyboardButton(text=category_name, callback_data=f"category_{category_id}_{category_id}")
         ])
 
     nav_buttons = []
