@@ -132,7 +132,7 @@ class APIClient:
         """Получение списка стилей"""
         url = f"{self.base_api_url}/prompts/styles/"
         if category_id:
-            url += f"?category_id={category_id}"
+            url += f"?category={category_id}"
         return await self._make_request("GET", url)
 
     async def get_categories_list(self) -> Any:
