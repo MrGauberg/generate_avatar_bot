@@ -38,7 +38,7 @@ async def create_dispatcher():
     """Создает и возвращает диспетчер с Redis-хранилищем"""
     global dp
     if dp is None:
-        storage = RedisStorage(redis_client)
+        storage = RedisStorage(redis_client.redis)
         dp = Dispatcher(storage=storage)
     return dp
 
