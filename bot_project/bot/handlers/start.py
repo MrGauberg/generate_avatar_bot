@@ -7,7 +7,7 @@ from bot.keyboards.inline import start_keyboard
 from bot.utils.logger import logger
 from bot.services.api_client import api_client
 from bot.keyboards.reply import main_menu_keyboard
-from bot_project.bot.services.redis_client import redis_client
+from bot.services.redis_client import redis_client
 
 router = Router()
 
