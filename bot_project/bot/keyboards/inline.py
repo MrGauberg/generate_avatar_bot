@@ -195,8 +195,17 @@ def get_categories_slider(categories, page=0):
     nav_buttons = []
     if start_index > 0:
         nav_buttons.append(InlineKeyboardButton(text="⬅ Назад", callback_data=f"category_page_{page - 1}"))
+    else:
+        if len(paged_categories) > categories_per_page:
+            nav_buttons.append(InlineKeyboardButton(text=" ", callback_data="ignore"))
+
+    if len(paged_categories) > categories_per_page:
+        nav_buttons.append(InlineKeyboardButton(text=" ", callback_data="ignore"))
     if end_index < len(categories):
         nav_buttons.append(InlineKeyboardButton(text="Вперед ➡", callback_data=f"category_page_{page + 1}"))
+    else:
+        if len(paged_categories) > categories_per_page:
+            nav_buttons.append(InlineKeyboardButton(text=" ", callback_data="ignore"))
 
     if nav_buttons:
         buttons.append(nav_buttons)
