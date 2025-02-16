@@ -128,14 +128,16 @@ class APIClient:
         url = f"{self.base_api_url}/avatars/{avatar_id}/activate/"
         return await self._make_request("PATCH", url)
 
-    async def get_styles_list(self) -> Any:
+    async def get_styles_list(self, category_id: int = None) -> Any:
         """Получение списка стилей"""
-        url = f"{self.base_api_url}/styles/"
+        url = f"{self.base_api_url}/prompts/styles/"
+        if category_id:
+            url += f"?category_id={category_id}"
         return await self._make_request("GET", url)
 
     async def get_categories_list(self) -> Any:
         """Получение списка категорий"""
-        url = f"{self.base_api_url}/categories/"
+        url = f"{self.base_api_url}/prompts/categories/"
         return await self._make_request("GET", url)
 
     async def generate_user_image(self, prompt: str, model_id: int) -> Any:

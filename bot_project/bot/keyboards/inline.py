@@ -174,3 +174,54 @@ def god_mode_instruction_keyboard():
     return InlineKeyboardMarkup(
         inline_keyboard=[[InlineKeyboardButton(text="🔙 Назад", callback_data="godmode_menu")]]
     )
+
+
+
+def get_categories_slider(categories, page=0):
+    """Создает inline-клавиатуру с категориями (слайдер по 3 штуки)"""
+    categories.insert(0, {"id": None, "name": "Без категории"}) 
+
+    buttons = []
+    categories_per_page = 3
+    start_index = page * categories_per_page
+    end_index = start_index + categories_per_page
+    paged_categories = categories[start_index:end_index]
+
+    for category in paged_categories:
+        buttons.append([
+            InlineKeyboardButton(text=category["name"], callback_data=f"category_{category['id']}")
+        ])
+
+    nav_buttons = []
+    if start_index > 0:
+        nav_buttons.append(InlineKeyboardButton(text="⬅ Назад", callback_data=f"category_page_{page - 1}"))
+    if end_index < len(categories):
+        nav_buttons.append(InlineKeyboardButton(text="Вперед ➡", callback_data=f"category_page_{page + 1}"))
+
+    if nav_buttons:
+        buttons.append(nav_buttons)
+
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+
+def get_styles_slider(styles, page=0):
+    """Создает inline-клавиатуру с слайдером стилей (по 3 штуки)"""
+    buttons = []
+    styles_per_page = 3
+    start_index = page * styles_per_page
+    end_index = start_index + styles_per_page
+    paged_styles = styles[start_index:end_index]
+
+    for style in paged_styles:
+        buttons.append([InlineKeyboardButton(text=style["name"], callback_data=f"style_{style['id']}")])
+
+    nav_buttons = []
+    if start_index > 0:
+        nav_buttons.append(InlineKeyboardButton(text="⬅ Назад", callback_data=f"style_page_{page - 1}"))
+    if end_index < len(styles):
+        nav_buttons.append(InlineKeyboardButton(text="Вперед ➡", callback_data=f"style_page_{page + 1}"))
+
+    if nav_buttons:
+        buttons.append(nav_buttons)
+
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
