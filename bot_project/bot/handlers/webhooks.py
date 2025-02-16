@@ -3,7 +3,7 @@
 from aiohttp import web
 from aiogram import Bot
 from bot.config import Settings
-from avatar import allowed_users
+from .avatar import allowed_users
 import logging
 
 bot = Bot(token=Settings.bot.TOKEN)
