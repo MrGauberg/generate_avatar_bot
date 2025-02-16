@@ -2,7 +2,7 @@
 
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from bot.config import Settings
-from bot_project.bot.services.api_client import api_client
+from bot.services.api_client import api_client
 
 
 async def gender_selection_keyboard():
