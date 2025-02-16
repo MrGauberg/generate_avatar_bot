@@ -74,10 +74,11 @@ async def handle_photo_upload(message: types.Message):
     else:
         if await redis_client.get_user_state(user_id) == "waiting_for_photos":
             await redis_client.set_user_state(user_id, "waiting_for_gender")
-            await message.answer(
-                "✅ Все фото загружены!\nВыберите пол аватара:",
-                reply_markup=gender_selection_keyboard(),
-            )
+            if await redis_client.get_user_state(user_id) == "waiting_for_gender":
+                await message.answer(
+                    "✅ Все фото загружены!\nВыберите пол аватара:",
+                    reply_markup=gender_selection_keyboard(),
+                )
 
 
 
