@@ -48,7 +48,7 @@ class AvatarUploadView(APIView):
     def post(self, request):
         tg_user_id = request.data.get("tg_user_id")  
         files = request.FILES.getlist("images")
-        gender = request.data.get("gender", "male")
+        gender = request.data.get("gender")
         
         if len(files) != settings.IMAGES_COUNT:
             return Response({"error": f"Должно быть ровно {settings.IMAGES_COUNT} изображений"}, status=status.HTTP_400_BAD_REQUEST)

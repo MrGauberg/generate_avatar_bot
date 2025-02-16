@@ -23,6 +23,7 @@ class AvatarSerializer(serializers.ModelSerializer):
 
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     images = AvatarImageSerializer(many=True, read_only=True)
+    gender = serializers.IntegerField(source="gender_id")
 
     class Meta:
         model = Avatar
