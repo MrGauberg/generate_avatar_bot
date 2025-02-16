@@ -16,7 +16,7 @@ class PromptStyle(models.Model):
     category = models.ForeignKey(PromptCategory, on_delete=models.CASCADE, related_name='styles', null=True, blank=True)
 
     def __str__(self):
-        return f'{self.name} ({self.category.name})'
+        return f'{self.name} ({self.category.name})' if self.category else self.name
     
     class Meta:
         verbose_name = 'Стиль промпта'
