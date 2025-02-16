@@ -66,19 +66,21 @@ async def handle_photo_upload(message: types.Message):
     largest_photo = message.photo[-1].file_id
     await redis_client.save_photo(user_id, largest_photo)
 
+    # Сразу обновляем состояние, чтобы избежать параллельного срабатывания
     photos = await redis_client.get_photos(user_id)
     uploaded_count = len(photos)
 
-    if uploaded_count < MAX_PHOTOS:
-        await message.answer(f"📷 Принято! Загружено {uploaded_count}/{MAX_PHOTOS} фото.")
-    else:
-        if await redis_client.get_user_state(user_id) == "waiting_for_photos":
+    if uploaded_count >= MAX_PHOTOS:
+        current_state = await redis_client.get_user_state(user_id)
+        if current_state == "waiting_for_photos":
             await redis_client.set_user_state(user_id, "waiting_for_gender")
-            if await redis_client.get_user_state(user_id) == "waiting_for_gender":
-                await message.answer(
-                    "✅ Все фото загружены!\nВыберите пол аватара:",
-                    reply_markup=gender_selection_keyboard(),
-                )
+            await message.answer(
+                "✅ Все фото загружены!\nВыберите пол аватара:",
+                reply_markup=gender_selection_keyboard(),
+            )
+    else:
+        await message.answer(f"📷 Принято! Загружено {uploaded_count}/{MAX_PHOTOS} фото.")
+
 
 
 
