@@ -117,6 +117,7 @@ async def handle_gender_choice(callback: types.CallbackQuery, bot: Bot):
         avatar_id = response.get("avatar_id")
 
         if avatar_id:
+            redis_client.set_user_authorized(user_id, True)
             await callback.message.edit_text(f"🎉 Аватар создан! ID: {avatar_id}")
         else:
             await callback.message.edit_text("❌ Ошибка при создании аватара.")
