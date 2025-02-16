@@ -35,17 +35,6 @@ def get_styles_keyboard(styles, category_id=None):
 
 
 
-def profile_keyboard():
-    """Клавиатура профиля"""
-    buttons = [
-        [InlineKeyboardButton(text="🔄 Обновить профиль", callback_data="profile_refresh")],
-        [InlineKeyboardButton(text="💰 Пополнить генерации", callback_data="menu_buy")],
-        [InlineKeyboardButton(text="⚙ Настройки", callback_data="menu_settings")]
-    ]
-    return InlineKeyboardMarkup(inline_keyboard=buttons)
-
-
-
 def support_keyboard():
     """Клавиатура поддержки"""
     buttons = [
