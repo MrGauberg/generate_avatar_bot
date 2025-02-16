@@ -3,8 +3,10 @@ import json
 from django.conf import settings
 from django.core.files.storage import default_storage
 
-from avatars.models import Avatar, AvatarImage
+from avatars.models import Avatar, AvatarGender, AvatarImage
 from .models import LeonardoGeneration
+
+
 
 LEONARDO_API_KEY = settings.LEONARDO_API_KEY
 LEONARDO_BASE_URL = "https://cloud.leonardo.ai/api/rest/v1"
@@ -27,7 +29,8 @@ class LeonardoService:
         :param image_files: список файлов изображений
         :return: ID аватара
         """
-        avatar = Avatar.objects.create(user=user, gender=int(gender), is_active=True)
+        gender = AvatarGender.objects.get(id=gender)
+        avatar = Avatar.objects.create(user=user, gender=gender, is_active=True)
         Avatar.objects.exclude(id=avatar.id).update(is_active=False)
 
         for image_file in image_files:
