@@ -16,25 +16,49 @@ from bot.utils.logger import logger
 from bot.middlewares.throttle import ThrottleMiddleware
 from bot.handlers import instruction
 from bot.handlers import ukassa
-from bot.handlers.webhooks import start_webhook_server
+from bot.handlers.webhooks import handle_payment_webhook
+from aiogram.fsm.storage.redis import RedisStorage
+from aiohttp import web
+
+import redis.asyncio as redis
+
 
 # Настраиваем логирование
 logging.basicConfig(level=logging.INFO)
 
-# Инициализируем бота и диспетчер
-bot = Bot(token=Settings.bot.TOKEN)
-dp = Dispatcher()
 
-dp.include_router(start.router)
-dp.include_router(avatar.router)
-dp.include_router(categories.router)
-dp.include_router(god_mode.router)
-dp.include_router(settings.router)
-dp.include_router(support.router)
-dp.include_router(generation.router) 
-dp.include_router(instruction.router)
-dp.include_router(ukassa.router)
-# dp.message.middleware(ThrottleMiddleware(rate_limit=0.3))  # антифлуд
+# Инициализируем бота
+bot = Bot(token=Settings.bot.TOKEN)
+dp: Dispatcher | None = None
+
+
+async def create_dispatcher():
+    """Создает и возвращает диспетчер с Redis-хранилищем"""
+    global dp
+    if dp is None:
+        redis_host = Settings.redis.host
+        redis_port = Settings.redis.port
+        redis_client = redis.Redis(host=redis_host, port=redis_port, decode_responses=True)
+        storage = RedisStorage(redis_client)
+        dp = Dispatcher(storage=storage)
+    return dp
+
+
+async def start_webhook_server(dp: Dispatcher):
+    """Запускаем веб-сервер для обработки вебхуков"""
+    link = "/payment-webhook/"
+    port = 8090 
+    ip = "0.0.0.0"
+
+    app = web.Application()
+    app["dp"] = dp  # Передаем Dispatcher в app
+    app.router.add_post(link, handle_payment_webhook)
+
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, ip, port)
+    await site.start()
+    logging.info(f"Webhook server запущен на http://{ip}:{port}{link}")
 
 
 async def set_menu():
@@ -63,13 +87,25 @@ async def on_startup():
 
 async def main():
     """Главная асинхронная функция запуска бота"""
+    dp = await create_dispatcher()
+    dp.include_router(start.router)
+    dp.include_router(avatar.router)
+    dp.include_router(categories.router)
+    dp.include_router(god_mode.router)
+    dp.include_router(settings.router)
+    dp.include_router(support.router)
+    dp.include_router(generation.router) 
+    dp.include_router(instruction.router)
+    dp.include_router(ukassa.router)
+    # dp.message.middleware(ThrottleMiddleware(rate_limit=0.3))  # антифлуд
+
     await on_startup()
     await set_menu()
     
     try:
         await asyncio.gather(
             dp.start_polling(bot),
-            start_webhook_server()
+            start_webhook_server(dp)
         )
     finally:
         await api_client.close()

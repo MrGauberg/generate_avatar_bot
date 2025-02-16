@@ -1,10 +1,11 @@
 # bot/handlers/webhooks.py
 
 from aiohttp import web
-from aiogram import Bot
+from aiogram import Bot, Dispatcher
 from bot.config import Settings
-from .avatar import allowed_users
 import logging
+
+from bot.handlers.avatar import AvatarState
 
 bot = Bot(token=Settings.bot.TOKEN)
 
@@ -25,7 +26,11 @@ async def handle_payment_webhook(request):
             chat_id=user_id,
             message_id=message_id
         )
-        allowed_users.add(user_id)
+        app = request.app
+        dp: Dispatcher = app["dp"]
+        state = dp.fsm.get_context(user_id=user_id, chat_id=user_id)
+        await state.set_state(AvatarState.waiting_for_photos)
+
         return web.json_response({"message": "Payment confirmed"}, status=200)
 
     except Exception as e:
@@ -33,17 +38,3 @@ async def handle_payment_webhook(request):
         return web.json_response({"error": str(e)}, status=500)
 
 
-
-async def start_webhook_server():
-    """Запускаем веб-сервер для обработки вебхуков"""
-    link = "/payment-webhook/"
-    port = 8090 
-    ip = "0.0.0.0"
-    app = web.Application()
-    app.router.add_post(link, handle_payment_webhook)
-
-    runner = web.AppRunner(app)
-    await runner.setup()
-    site = web.TCPSite(runner, ip, port)
-    await site.start()
-    logging.info(f"Webhook server запущен на http://{ip}:{port}{link}")

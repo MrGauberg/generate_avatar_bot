@@ -14,6 +14,8 @@ import os
 import logging
 import aiofiles
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.fsm.state import StatesGroup, State
+from aiogram.fsm.context import FSMContext
 
 router = Router()
 
@@ -29,13 +31,15 @@ GENDER_CHOICES = {
 
 allowed_users = set()
 
+class AvatarState(StatesGroup):
+    waiting_for_photos = State()
+
 
 @router.callback_query(lambda c: c.data == "menu_create_avatar")
-async def avatar_callback_handler(callback: types.CallbackQuery):
+async def avatar_callback_handler(callback: types.CallbackQuery, state: FSMContext):
     """Обработка нажатия кнопки 'Создать аватар'"""
 
-    user_id = callback.from_user.id
-    allowed_users.add(user_id)
+    await state.set_state(AvatarState.waiting_for_photos)
 
     await callback.message.edit_text(
         f"📸 Отправьте мне {MAX_PHOTOS} фотографий для создания аватара.\n"
@@ -46,12 +50,13 @@ async def avatar_callback_handler(callback: types.CallbackQuery):
 
 
 @router.message(lambda message: message.photo)
-async def handle_photo_upload(message: types.Message):
+async def handle_photo_upload(message: types.Message, state: FSMContext):
     """Обработка загруженных фотографий (исправление дублирования)"""
     user_id = message.from_user.id
 
-    if user_id not in allowed_users:
-        await message.answer("⚠ Пожалуйста, сначала запросите создание аватара через меню!")
+    current_state = await state.get_state()
+    if current_state != AvatarState.waiting_for_photos:
+        await message.answer("⚠ Сначала запросите создание аватара через меню!")
         return
 
     if user_id not in user_photos:
@@ -211,7 +216,7 @@ async def return_to_avatar_menu(callback: types.CallbackQuery):
 
 
 @router.callback_query(lambda c: c.data == "avatar_add")
-async def add_avatar_handler(callback: types.CallbackQuery):
+async def add_avatar_handler(callback: types.CallbackQuery, state: FSMContext):
     """Проверка доступных слотов и покупка слота"""
     tg_user_id = callback.from_user.id
     response = await api_client.check_avatar_slots(tg_user_id)
@@ -220,7 +225,7 @@ async def add_avatar_handler(callback: types.CallbackQuery):
         await callback.message.edit_text(
             "📸 У вас есть свободный слот! Приступаем к созданию аватара."
         )
-        await avatar_callback_handler(callback)
+        await avatar_callback_handler(callback, state)
     else:
         price = await api_client.get_avatar_price()
         await callback.message.edit_text(

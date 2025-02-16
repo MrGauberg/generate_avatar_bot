@@ -25,8 +25,14 @@ class ServiceConfig:
     IMAGES_COUNT: int = int(os.getenv("IMAGES_COUNT", 10))
 
 
+class RedisConfig:
+    host: str = os.getenv("REDIS_HOST", "localhost")
+    port: int = int(os.getenv("REDIS_PORT", 6379))
+
+
 class Settings:
     bot = BotConfig()
     yookassa = YookassaConfig()
     user = UserConfig()
     service = ServiceConfig()
+    redis = RedisConfig()
