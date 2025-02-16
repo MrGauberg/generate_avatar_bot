@@ -118,10 +118,17 @@ class APIClient:
         url = f"{self.base_api_url}/payments/avatar/"
         return await self._make_request("POST", url, data)
 
-    async def get_user_avatars(self, user_tg_id) -> Any:
-        """Получение списка аватаров"""
-        url = f"{self.base_api_url}/avatars/{user_tg_id}/"
+    async def get_user_avatars(self) -> Any:
+        """Получение списка типов аватаров"""
+        url = f"{self.base_api_url}/gender/"
         return await self._make_request("GET", url)
+    
+    async def get_avatar_genders(self) -> dict:
+        """Получение списка полов аватара из API"""
+        url = f"{self.base_api_url}/avatars/genders/"
+        response = await self._make_request("GET", url)
+        return {gender["id"]: gender["gender"] for gender in response}
+
     
     async def activate_avatar(self, avatar_id) -> Any:
         """Получение списка аватаров"""

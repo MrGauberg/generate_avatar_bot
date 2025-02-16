@@ -1,6 +1,18 @@
 from django.db import models
 from django.conf import settings
 
+
+class AvatarGender(models.Model):
+    gender = models.CharField(max_length=40)
+
+    def __str__(self):
+        return f"Пол: {self.gender}"
+    
+    class Meta:
+        verbose_name = 'Пол'
+        verbose_name_plural = 'Пол'
+
+
 class Avatar(models.Model):
     """Модель для хранения информации об аватаре пользователя"""
     GENDER_CHOICES = [
@@ -13,7 +25,7 @@ class Avatar(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="avatars")
     dataset_id = models.CharField(max_length=100, unique=True, blank=True, null=True)
     model_id = models.CharField(max_length=100, unique=True, blank=True, null=True)
-    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
+    gender = models.ForeignKey(AvatarGender, on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=False)
 
@@ -58,3 +70,4 @@ class PhotoFormat(models.Model):
     class Meta:
         verbose_name = 'Формат фото'
         verbose_name_plural = 'Форматы фото'
+

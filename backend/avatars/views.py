@@ -5,8 +5,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
-from .models import Avatar, AvatarSettings
-from .serializers import AvatarSerializer
+from .models import Avatar, AvatarGender, AvatarSettings
+from .serializers import AvatarAvatarGenderSerializer, AvatarSerializer
 from leonardo_service.services import LeonardoService
 from django.conf import settings
 from django.http import JsonResponse
@@ -101,6 +101,10 @@ class CheckAvatarSlotsView(APIView):
         available_slots = user.settings.avatars_amount_available > total_avatars
         return Response({"can_add_avatar": available_slots})
 
+class AvatarGenderView(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    queryset = AvatarGender.objects.all()
+    serializer_class = AvatarAvatarGenderSerializer
 
 
 def get_avatar_price(request):

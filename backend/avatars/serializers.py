@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Avatar, AvatarImage
+from .models import Avatar, AvatarGender, AvatarImage
 from django.conf import settings
 
 
@@ -9,6 +9,13 @@ class AvatarImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = AvatarImage
         fields = ["id", "image"]
+
+class AvatarAvatarGenderSerializer(serializers.ModelSerializer):
+    """Сериализатор для изображений аватара"""
+
+    class Meta:
+        model = AvatarGender
+        fields = ["id", "gender"]
 
 
 class AvatarSerializer(serializers.ModelSerializer):

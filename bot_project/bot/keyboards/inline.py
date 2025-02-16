@@ -2,16 +2,17 @@
 
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from bot.config import Settings
+from bot_project.bot.services.api_client import api_client
 
 
-def gender_selection_keyboard():
-    """Клавиатура выбора пола"""
-    buttons = [
-        [InlineKeyboardButton(text="👨 Мужчина", callback_data="avatar_gender_male")],
-        [InlineKeyboardButton(text="👩 Женщина", callback_data="avatar_gender_female")],
-        [InlineKeyboardButton(text="👶 Ребенок", callback_data="avatar_gender_child")]
-    ]
+async def gender_selection_keyboard():
+    """Динамическая клавиатура выбора пола"""
+    genders = await api_client.get_avatar_genders()
+    buttons = [[InlineKeyboardButton(text=f"👤 {name}", callback_data=f"avatar_gender_{gender_id}")]
+               for gender_id, name in genders.items()]
+
     return InlineKeyboardMarkup(inline_keyboard=buttons)
+
 
 
 def get_categories_keyboard(categories):

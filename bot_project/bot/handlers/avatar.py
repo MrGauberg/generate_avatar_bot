@@ -84,11 +84,14 @@ async def handle_photo_upload(message: types.Message):
 
 
 
-@router.callback_query(lambda c: c.data in GENDER_CHOICES)
+@router.callback_query(lambda c: c.data.startswith("avatar_gender_"))
 async def handle_gender_choice(callback: types.CallbackQuery, bot: Bot):
     """Обработка выбора пола"""
     user_id = callback.from_user.id
-    gender = GENDER_CHOICES[callback.data]
+
+    genders = await api_client.get_avatar_genders()
+    gender_id = int(callback.data.split("_")[-1]) 
+    gender = genders.get(gender_id, "Неизвестный")
 
     photos = await redis_client.get_photos(user_id)
 
@@ -100,19 +103,16 @@ async def handle_gender_choice(callback: types.CallbackQuery, bot: Bot):
 
     await callback.message.edit_text("📤 Отправляем фото на сервер, подождите...")
 
-    # Подготовка файлов для загрузки
     files = []
-    temp_files = []  # Список для хранения путей временных файлов
+    temp_files = []  
 
     try:
         for i, photo_id in enumerate(photos):
             temp_file_path = os.path.join(tempfile.gettempdir(), f"photo_{i}.jpg")
 
-            # Скачиваем фото
             await bot.download(photo_id, destination=temp_file_path)
             temp_files.append(temp_file_path)
 
-            # Читаем содержимое и добавляем в список файлов для API
             async with aiofiles.open(temp_file_path, "rb") as temp_file:
                 file_data = await temp_file.read()
                 if file_data:
@@ -124,25 +124,25 @@ async def handle_gender_choice(callback: types.CallbackQuery, bot: Bot):
 
         if avatar_id:
             await redis_client.set_user_authorized(user_id, True)
-            await callback.message.edit_text(f"🎉 Аватар создан! ID: {avatar_id}")
+            await callback.message.edit_text(f"🎉 Аватар создан! ID: {avatar_id}. Можем приступать к генерации фотографий")
         else:
             await callback.message.edit_text("❌ Ошибка при создании аватара.")
 
     except Exception as e:
         logging.error(f"Ошибка загрузки аватара: {e}")
         await callback.message.edit_text(f"❌ Ошибка: {e}")
+
     finally:
-        # Удаляем временные файлы
         for temp_file_path in temp_files:
             try:
                 os.remove(temp_file_path)
             except Exception as e:
                 logging.warning(f"Не удалось удалить файл {temp_file_path}: {e}")
 
-        # Очищаем временные данные из Redis
         await redis_client.clear_photos(user_id)
 
     await callback.answer()
+
 
 
 @router.message(lambda message: message.text == "🖼 Аватар")
