@@ -23,7 +23,7 @@ async def generations_button_handler(event: types.Message | types.CallbackQuery)
         message = event.message
         is_callback = True
 
-    user_id = message.from_user.id
+    user_id = event.from_user.id
 
     await message.answer("⏳ Получаем информацию о ваших генерациях...")
 
