@@ -15,7 +15,7 @@ services:
 
   backend:
     build: ./backend/
-    entrypoint: sh entrypoint.sh
+    # entrypoint: sh entrypoint.sh
     env_file: .env
     depends_on:
       - db
