@@ -125,7 +125,7 @@ class APIClient:
     
     async def get_avatar_genders(self) -> dict:
         """Получение списка полов аватара из API"""
-        url = f"{self.base_api_url}/avatars/genders/"
+        url = f"{self.base_api_url}/avatars/gender/"
         response = await self._make_request("GET", url)
         return {gender["id"]: gender["gender"] for gender in response}
 
