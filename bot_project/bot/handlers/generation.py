@@ -99,3 +99,33 @@ async def generate_image_callback(callback: types.CallbackQuery):
         await callback.message.answer(f"❌ Ошибка: {e}")
 
     await callback.answer()
+
+
+@router.callback_query(lambda c: c.data == "choose_package")
+async def choose_package_handler(callback: types.CallbackQuery):
+    """Вывод списка пакетов для покупки"""
+    await callback.message.edit_text("⏳ Загружаем доступные пакеты...")
+
+    try:
+        packages = await api_client.get_package_types()
+        if not packages:
+            await callback.message.edit_text("❌ Ошибка при получении списка пакетов.")
+            return
+
+        buttons = [
+            [InlineKeyboardButton(text=f"📦 {pkg['name']} - {pkg['amount']}₽", callback_data=f"payment_{pkg['id']}")]
+            for pkg in packages
+        ]
+        buttons.append([InlineKeyboardButton(text="📞 Поддержка", callback_data="menu_support")])
+        buttons.append([InlineKeyboardButton(text="🔙 Назад", callback_data="back_to_generations")])
+
+        await callback.message.edit_text(
+            "💰 **Выберите пакет для покупки:**",
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=buttons)
+            
+        )
+
+    except Exception as e:
+        await callback.message.edit_text(f"❌ Ошибка при получении пакетов: {e}")
+
+    await callback.answer()
