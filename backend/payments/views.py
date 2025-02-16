@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from yookassa import Payment, Configuration
 from django.conf import settings
-from avatars.models import AvatarSettings
+from avatars.models import Avatar, AvatarSettings
 from packages.models import Package, PackageType
 from payments.models import PaymentRecord
 from rest_framework import status
@@ -146,6 +146,10 @@ class YooKassaWebhookView(APIView):
                     user.settings.avatars_amount_available += 1
                     user.settings.save()
                 user.save()
+
+                # Ээто для отправки пользователю сообщения о том. что нужно создать аватар если он еще не создан
+                if not Avatar.objects.filter(user=user).exists():
+                    payment_type = "avatar"
 
                 # Уведомляем бота о статусе оплаты
                 webhook_url = f"{settings.API_URL}/bot/payment-webhook/"

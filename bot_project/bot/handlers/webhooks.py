@@ -38,7 +38,7 @@ async def handle_payment_webhook(request):
             )
         elif payment_type == "package":
             await bot.edit_message_text(
-                f"✅ Оплата прошла успешно! Вам доступно {total_generations} генераций.",
+                f"✅ Оплата прошла успешно! Вам доступно +{total_generations} генераций.",
                 chat_id=user_id,
                 message_id=message_id
             )
