@@ -1,11 +1,11 @@
 # bot/handlers/webhooks.py
 
 from aiohttp import web
-from aiogram import Bot, Dispatcher
+from aiogram import Bot
 from bot.config import Settings
 import logging
 
-from bot_project.bot.services.redis_client import redis_client
+from bot.services.redis_client import redis_client
 
 bot = Bot(token=Settings.bot.TOKEN)
 
