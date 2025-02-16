@@ -23,6 +23,11 @@ class PackageTypeViewSet(viewsets.ModelViewSet):
     queryset = PackageType.objects.all()
     serializer_class = PackageTypeSerializer
     permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        return super().get_queryset().order_by('amount')    
+
+    
 
 
 class PackageViewSet(viewsets.ModelViewSet):

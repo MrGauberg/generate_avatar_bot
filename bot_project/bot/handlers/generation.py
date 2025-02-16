@@ -25,7 +25,6 @@ async def generations_button_handler(event: types.Message | types.CallbackQuery)
 
     user_id = event.from_user.id
 
-    await message.answer("⏳ Получаем информацию о ваших генерациях...")
 
     try:
         user_packages = await api_client.get_user_packages(user_id)

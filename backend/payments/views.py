@@ -84,6 +84,7 @@ class CreatePackagePaymentView(BasePaymentView):
                 "message_id": message_id,
                 "type": "package",
                 "package_id": package.id,
+                "total_generations": package_type.total_generations,
             },
         )
 
@@ -149,7 +150,7 @@ class YooKassaWebhookView(APIView):
                 # Уведомляем бота о статусе оплаты
                 webhook_url = f"{settings.API_URL}/bot/payment-webhook/"
                 requests.post(
-                    webhook_url, json={"user_id": telegram_id, "message_id": message_id}
+                    webhook_url, json={"user_id": telegram_id, "message_id": message_id, "payment_type": payment_type, "total_generations": metadata.get("total_generations")}
                 )
 
             return Response(
