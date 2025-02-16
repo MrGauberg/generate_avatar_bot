@@ -90,12 +90,12 @@ async def main():
     dp.include_router(start.router)
     dp.include_router(avatar.router)
     dp.include_router(categories.router)
-    dp.include_router(god_mode.router)
     dp.include_router(settings.router)
     dp.include_router(support.router)
     dp.include_router(generation.router) 
     dp.include_router(instruction.router)
     dp.include_router(ukassa.router)
+    dp.include_router(god_mode.router)
     # dp.message.middleware(ThrottleMiddleware(rate_limit=0.3))  # антифлуд
 
     await on_startup()
