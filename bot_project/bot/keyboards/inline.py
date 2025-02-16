@@ -88,7 +88,7 @@ def get_avatar_slider_keyboard(avatars, page=0):
 
     for avatar in paged_avatars:
         active = " ✅" if avatar.get("is_active", False) else ""
-        avatar_id = f" № {avatar.get("id")}" if avatar.get("id") else ""
+        avatar_id = f" № {avatar.get('id')}" if avatar.get("id") else ""
         print(avatar)
         buttons.append([InlineKeyboardButton(text=f"🖼 {avatar['name']}{active}{avatar_id}", callback_data=f"avatar_select_{avatar['id']}_{avatar['name']}")])
 
