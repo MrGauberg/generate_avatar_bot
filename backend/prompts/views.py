@@ -18,4 +18,5 @@ class PromptStyleViewSet(viewsets.ModelViewSet):
         category_id = self.request.query_params.get('category')
         if category_id:
             return self.queryset.filter(category_id=category_id)
-        return self.queryset
+        else:
+            return self.queryset.filter(category_id__isnull=True)

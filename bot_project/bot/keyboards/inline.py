@@ -90,7 +90,7 @@ def get_avatar_slider_keyboard(avatars, page=0):
         active = " ✅" if avatar.get("is_active", False) else ""
         avatar_id = f" № {avatar.get('id')}" if avatar.get("id") else ""
         print(avatar)
-        buttons.append([InlineKeyboardButton(text=f"🖼 {avatar['name']}{active}{avatar_id}", callback_data=f"avatar_select_{avatar['id']}_{avatar['name']}")])
+        buttons.append([InlineKeyboardButton(text=f"🖼 {avatar['name']}{avatar_id}{active}", callback_data=f"avatar_select_{avatar['id']}_{avatar['name']}")])
 
     nav_buttons = []
     if start_index > 0:
