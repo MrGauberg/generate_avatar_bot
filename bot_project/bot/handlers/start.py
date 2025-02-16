@@ -7,6 +7,8 @@ from bot.handlers.generation import generate_menu_callback
 from bot.handlers.god_mode import god_mode_menu_callback
 from bot.handlers.settings import settings_menu_callback
 from bot.handlers.support import support_callback_handler
+from bot.utils.auth import require_authorization
+
 
 from bot.utils.logger import logger
 from bot.services.api_client import api_client
@@ -45,6 +47,7 @@ async def start_handler(message: types.Message):
 
 
 @router.message(lambda message: message.text == "🎨 Стили")
+@require_authorization
 async def styles_button_handler(message: types.Message):
     """Обработка кнопки 'Стили'"""
     await message.answer("Выберите стиль для генерации изображений.")
@@ -52,6 +55,7 @@ async def styles_button_handler(message: types.Message):
 
 
 @router.message(lambda message: message.text == "🔮 Режим Бога")
+@require_authorization
 async def god_mode_button_handler(message: types.Message):
     """Обработка кнопки 'Режим Бога'"""
     await god_mode_menu_callback(message)
@@ -59,6 +63,7 @@ async def god_mode_button_handler(message: types.Message):
 
 
 @router.message(lambda message: message.text == "⚙ Настройки")
+@require_authorization
 async def settings_button_handler(message: types.Message):
     """Обработка кнопки 'Настройки'"""
     await settings_menu_callback(message)
@@ -66,6 +71,7 @@ async def settings_button_handler(message: types.Message):
 
 
 @router.message(lambda message: message.text == "📞 Поддержка")
+@require_authorization
 async def support_button_handler(message: types.Message):
     """Обработка кнопки 'Поддержка'"""
     await support_callback_handler(message)

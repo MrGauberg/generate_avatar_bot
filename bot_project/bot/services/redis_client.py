@@ -46,5 +46,19 @@ class RedisClient:
         key = f"user:{user_id}:photos"
         await self.redis.delete(key)
 
+
+    ### --- Методы для работы с авторизацией пользователей --- ###
+    
+    async def set_user_authorized(self, user_id: int, is_authorized: bool):
+        """Сохраняет статус авторизации пользователя"""
+        key = f"user:{user_id}:is_authorized"
+        await self.redis.set(key, int(is_authorized))
+
+    async def is_user_authorized(self, user_id: int) -> bool:
+        """Проверяет, авторизован ли пользователь"""
+        key = f"user:{user_id}:is_authorized"
+        result = await self.redis.get(key)
+        return bool(int(result)) if result is not None else False
+
     
 redis_client = RedisClient()
