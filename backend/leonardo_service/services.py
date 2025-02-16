@@ -27,7 +27,7 @@ class LeonardoService:
         :param image_files: список файлов изображений
         :return: ID аватара
         """
-        avatar = Avatar.objects.create(user=user, gender=gender, is_active=True)
+        avatar = Avatar.objects.create(user=user, gender=int(gender), is_active=True)
         Avatar.objects.exclude(id=avatar.id).update(is_active=False)
 
         for image_file in image_files:
