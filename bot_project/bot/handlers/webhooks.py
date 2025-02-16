@@ -3,6 +3,7 @@
 from aiohttp import web
 from aiogram import Bot
 from bot.config import Settings
+from avatar import allowed_users
 import logging
 
 bot = Bot(token=Settings.bot.TOKEN)
@@ -24,7 +25,7 @@ async def handle_payment_webhook(request):
             chat_id=user_id,
             message_id=message_id
         )
-
+        allowed_users.add(user_id)
         return web.json_response({"message": "Payment confirmed"}, status=200)
 
     except Exception as e:
