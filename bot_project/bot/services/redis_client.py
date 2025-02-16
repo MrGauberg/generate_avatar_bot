@@ -52,6 +52,7 @@ class RedisClient:
     async def set_user_authorized(self, user_id: int, is_authorized: bool):
         """Сохраняет статус авторизации пользователя"""
         key = f"user:{user_id}:is_authorized"
+        print(key)
         await self.redis.set(key, int(is_authorized))
 
     async def is_user_authorized(self, user_id: int) -> bool:

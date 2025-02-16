@@ -20,7 +20,7 @@ async def start_handler(message: types.Message):
     try:
         user_data = await api_client.get_user_profile(user_id)
         if user_data.get("is_authorized"):
-            redis_client.set_user_authorized(user_id, True)
+            await redis_client.set_user_authorized(user_id, True)
             await message.answer(
                 "👋 Привет! Рад видеть тебя снова!\n\n"
                 "Выбери, что хочешь сделать сегодня: создать аватар, попробовать режим 'Бога' или просто поэкспериментировать с генерацией изображений!",
@@ -30,7 +30,7 @@ async def start_handler(message: types.Message):
     except Exception as e:
         logger.error(f"Ошибка при проверке авторизации: {e}")
 
-    redis_client.set_user_authorized(user_id, False)
+    await redis_client.set_user_authorized(user_id, False)
     await message.answer(
         "👋 Привет! Добро пожаловать в нашего бота!\n\n"
         "🎨 Здесь ты сможешь создать уникальный аватар по своим фото и генерировать изображения в разных стилях!\n\n"
