@@ -30,44 +30,13 @@ GENDER_CHOICES = {
     "avatar_gender_child": "child",
 }
 
-async def set_user_state(user_id, state):
-    """Устанавливает состояние пользователя в Redis"""
-    key = f"user:{user_id}:state"
-    await redis_client.set(key, state)
-
-async def get_user_state(user_id):
-    """Получает текущее состояние пользователя"""
-    key = f"user:{user_id}:state"
-    return await redis_client.get(key)
-
-async def save_photo_to_redis(user_id, photo_id):
-    """Сохранение фото в Redis"""
-    key = f"user:{user_id}:photos"
-    await redis_client.rpush(key, photo_id)
-
-
-async def get_photos_from_redis(user_id):
-    """Получение списка загруженных фото"""
-    key = f"user:{user_id}:photos"
-    return await redis_client.lrange(key, 0, -1)
-
-
-async def clear_photos_from_redis(user_id):
-    """Очистка загруженных фото"""
-    key = f"user:{user_id}:photos"
-    await redis_client.delete(key)
-
-async def set_user_state(user_id, state):
-    """Устанавливает состояние пользователя в Redis"""
-    key = f"user:{user_id}:state"
-    await redis_client.set(key, state)
 
 @router.callback_query(lambda c: c.data == "menu_create_avatar")
 async def avatar_callback_handler(callback: types.CallbackQuery):
     """Обработка нажатия кнопки 'Создать аватар'"""
-    await clear_photos_from_redis(callback.from_user.id)
+    await redis_client.clear_photos(callback.from_user.id)
     user_id = callback.from_user.id
-    await set_user_state(user_id, "waiting_for_photos")
+    await redis_client.set_user_state(user_id, "waiting_for_photos")
 
     await callback.message.edit_text(
         f"📸 Отправьте мне {MAX_PHOTOS} фотографий для создания аватара.\n"
@@ -81,22 +50,22 @@ async def handle_photo_upload(message: types.Message):
     """Обработка загруженных фотографий"""
     user_id = message.from_user.id
 
-    user_state = await get_user_state(user_id)
+    user_state = await redis_client.get_user_state(user_id)
 
     if user_state != "waiting_for_photos":
         await message.answer("⚠ Сейчас загрузка фото не требуется. Начните создание аватара заново.")
         return
     
-    photos = await get_photos_from_redis(user_id)
+    photos = await redis_client.get_photos(user_id)
     if len(photos) >= MAX_PHOTOS:
         await message.answer("⚠ Вы уже загрузили достаточное количество фото!")
         return
 
     # Берем ТОЛЬКО самое большое фото
     largest_photo = message.photo[-1].file_id
-    await save_photo_to_redis(user_id, largest_photo)
+    await redis_client.save_photo(user_id, largest_photo)
 
-    photos = await get_photos_from_redis(user_id)
+    photos = await redis_client.get_photos(user_id)
     uploaded_count = len(photos)
 
     if uploaded_count < MAX_PHOTOS:
@@ -114,7 +83,7 @@ async def handle_gender_choice(callback: types.CallbackQuery, bot: Bot):
     user_id = callback.from_user.id
     gender = GENDER_CHOICES[callback.data]
 
-    photos = await get_photos_from_redis(user_id)
+    photos = await redis_client.get_photos(user_id)
 
     if len(photos) < MAX_PHOTOS:
         await callback.message.edit_text(
@@ -163,7 +132,7 @@ async def handle_gender_choice(callback: types.CallbackQuery, bot: Bot):
                 logging.warning(f"Не удалось удалить файл {temp_file_path}: {e}")
 
         # Очищаем временные данные из Redis
-        await clear_photos_from_redis(user_id)
+        await redis_client.clear_photos(user_id)
 
     await callback.answer()
 
