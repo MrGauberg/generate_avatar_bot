@@ -6,7 +6,7 @@ from bot.config import Settings
 import logging
 
 from bot.services.redis_client import redis_client
-from bot_project.bot.handlers.avatar import set_user_state
+from bot.handlers.avatar import set_user_state
 
 bot = Bot(token=Settings.bot.TOKEN)
 
