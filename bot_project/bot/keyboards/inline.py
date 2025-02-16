@@ -222,15 +222,16 @@ def get_styles_slider(styles, page=0):
     start_index = page * styles_per_page
     end_index = start_index + styles_per_page
     paged_styles = styles[start_index:end_index]
+    category_id = paged_styles[0]["category"]
 
     for style in paged_styles:
         buttons.append([InlineKeyboardButton(text=style["name"], callback_data=f"style_{style['id']}")])
 
     nav_buttons = []
     if start_index > 0:
-        nav_buttons.append(InlineKeyboardButton(text="⬅ Назад", callback_data=f"style_page_{page - 1}"))
+        nav_buttons.append(InlineKeyboardButton(text="⬅ Назад", callback_data=f"style_page_{page - 1}_{category_id}"))
     if end_index < len(styles):
-        nav_buttons.append(InlineKeyboardButton(text="Вперед ➡", callback_data=f"style_page_{page + 1}"))
+        nav_buttons.append(InlineKeyboardButton(text="Вперед ➡", callback_data=f"style_page_{page + 1}_{category_id}"))
 
     if nav_buttons:
         buttons.append(nav_buttons)

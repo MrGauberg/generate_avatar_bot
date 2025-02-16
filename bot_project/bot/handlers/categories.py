@@ -45,7 +45,8 @@ async def category_pagination_handler(callback: types.CallbackQuery):
 async def style_pagination_handler(callback: types.CallbackQuery):
     """Переключение страниц стилей"""
     page = int(callback.data.split("_")[2])
-    styles = await api_client.get_styles_list()
+    category_id = int(callback.data.split("_")[3])
+    styles = await api_client.get_styles_list(category_id)
     await callback.message.edit_text("📂 Выберите стиль и получите 2 фото:", reply_markup=get_styles_slider(styles, page))
     await callback.answer()
 
