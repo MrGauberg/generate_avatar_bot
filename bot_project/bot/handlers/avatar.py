@@ -120,7 +120,7 @@ async def handle_gender_choice(callback: types.CallbackQuery, bot: Bot):
                     files.append(("images", (f"photo_{i}.jpg", file_data, "image/jpeg")))
 
         # Отправляем файлы в API
-        response = await api_client.create_avatar(files=files, gender=gender, tg_user_id=user_id)
+        response = await api_client.create_avatar(files=files, gender=gender_id, tg_user_id=user_id)
         avatar_id = response.get("avatar_id")
 
         if avatar_id:
