@@ -104,10 +104,10 @@ class APIClient:
         url = f"{self.base_api_url}/packages/user-packages/{tg_user_id}/"
         return await self._make_request("GET", url)
 
-    async def create_avatar(self, files: List[Tuple[str, Tuple[str, bytes, str]]], gender: int, tg_user_id: int) -> Any:
+    async def create_avatar(self, files: List[Tuple[str, Tuple[str, bytes, str]]], gender: str, tg_user_id: int) -> Any:
         """Загрузка фотографий для создания аватара"""
         url = f"{self.base_api_url}/avatars/upload/"
-        data = {"gender": int(gender), "tg_user_id": tg_user_id}
+        data = {"gender": gender, "tg_user_id": tg_user_id}
         return await self._make_request("POST", url, data, files)
     
     async def check_avatar_slots(self, tg_user_id):
@@ -118,9 +118,9 @@ class APIClient:
         url = f"{self.base_api_url}/payments/avatar/"
         return await self._make_request("POST", url, data)
 
-    async def get_user_avatars(self) -> Any:
-        """Получение списка типов аватаров"""
-        url = f"{self.base_api_url}/gender/"
+    async def get_user_avatars(self, user_tg_id) -> Any:
+        """Получение списка аватаров"""
+        url = f"{self.base_api_url}/avatars/{user_tg_id}/"
         return await self._make_request("GET", url)
     
     async def get_avatar_genders(self) -> dict:
@@ -128,7 +128,6 @@ class APIClient:
         url = f"{self.base_api_url}/avatars/gender/"
         response = await self._make_request("GET", url)
         return {gender["id"]: gender["gender"] for gender in response}
-
     
     async def activate_avatar(self, avatar_id) -> Any:
         """Получение списка аватаров"""
