@@ -6,6 +6,7 @@ from bot.config import Settings
 import logging
 
 from bot.services.redis_client import redis_client
+from bot_project.bot.handlers.avatar import set_user_state
 
 bot = Bot(token=Settings.bot.TOKEN)
 
@@ -30,6 +31,7 @@ async def handle_payment_webhook(request):
 
         # Очищаем старые загруженные фото в Redis
         await clear_photos_from_redis(user_id)
+        await set_user_state(user_id, "waiting_for_photos")
 
         # Отправляем сообщение пользователю после успешной оплаты
         await bot.edit_message_text(
