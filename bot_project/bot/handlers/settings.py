@@ -8,15 +8,10 @@ from bot.utils.auth import require_authorization
 router = Router()
 
 
-@router.callback_query(lambda c: c.data == "menu_settings")
 @router.message(lambda message: message.text == "⚙ Настройки")
 @require_authorization
-async def settings_menu_callback(event: types.Message | types.CallbackQuery):
+async def settings_menu_callback(message: types.Message):
     """Обработчик кнопки 'Настройки'"""
-    if isinstance(event, types.CallbackQuery):
-        message = event.message
-    else:
-        message = event
 
     await message.answer("⚙ Выберите настройки:", reply_markup=settings_menu_keyboard())
 

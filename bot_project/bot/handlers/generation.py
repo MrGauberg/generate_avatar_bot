@@ -11,16 +11,10 @@ router = Router()
 
 
 @router.message(lambda message: message.text == "💰 Генерации")
-@router.callback_query(lambda c: c.data == "show_generations")
 @require_authorization
-async def generations_button_handler(event: types.Message | types.CallbackQuery):
+async def generations_button_handler(message: types.Message):
     """Обработка кнопки 'Генерации'"""
-    user_id = event.from_user.id
-
-    if isinstance(event, types.CallbackQuery):
-        message = event.message
-    else:
-        message = event
+    user_id = message.from_user.id
 
     await message.answer("⏳ Получаем информацию о ваших генерациях...")
 

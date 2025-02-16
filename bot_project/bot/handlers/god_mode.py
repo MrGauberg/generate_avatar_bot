@@ -12,10 +12,9 @@ router = Router()
 
 
 
-@router.callback_query(lambda c: c.data == "menu_god_mode")
 @router.message(lambda message: message.text == "🔮 Режим Бога")
 @require_authorization
-async def god_mode_menu(event: types.Message | types.CallbackQuery):
+async def god_mode_menu(event: types.Message):
     """Обработчик кнопки 'Режим Бога'"""
     user_id = event.from_user.id
     user_data = await api_client.get_user_profile(user_id)
