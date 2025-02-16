@@ -99,7 +99,7 @@ class APIClient:
         return float(response.get("price", 490.00))
     
 
-    async def get_user_packeges(self, tg_user_id: int) -> Any:
+    async def get_user_packages(self, tg_user_id: int) -> Any:
         """Получение списка пакетов генерациий для пользователя"""
         url = f"{self.base_api_url}/packages/user-packages/{tg_user_id}/"
         return await self._make_request("GET", url)

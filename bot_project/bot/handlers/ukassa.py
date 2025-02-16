@@ -36,7 +36,7 @@ async def process_email(message: types.Message, state: FSMContext):
 
         # Формируем inline-клавиатуру с вариантами пакетов
         buttons = [
-            [InlineKeyboardButton(text=f"📦 {pkg['name']} - {pkg['amount']}₽", callback_data=f"payment_{pkg['id']}")]
+            [InlineKeyboardButton(text=f"📦 {pkg['name']} {pkg['total_generations']} генераций - {pkg['amount']}₽", callback_data=f"payment_{pkg['id']}")]
             for pkg in packages
         ]
 

@@ -19,7 +19,7 @@ async def generations_button_handler(message: types.Message):
     await message.answer("⏳ Получаем информацию о ваших генерациях...")
 
     try:
-        user_packages = await api_client.get_user_packeges(user_id)
+        user_packages = await api_client.get_user_packages(user_id)
 
         if not isinstance(user_packages, list):
             await message.answer("❌ Ошибка при получении данных о генерациях.")
