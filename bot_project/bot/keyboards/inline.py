@@ -191,7 +191,7 @@ def get_categories_slider(categories, page=0):
         category_name = category["name"]
         category_id = category["id"]
         buttons.append([
-            InlineKeyboardButton(text=category_name, callback_data=f"category_{category_id}_{category_name}")
+            InlineKeyboardButton(text=category_name, callback_data=f"category_selected_{category_id}_{category_name}")
         ])
 
     nav_buttons = []

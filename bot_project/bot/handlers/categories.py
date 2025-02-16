@@ -16,12 +16,12 @@ async def styles_button_handler(message: types.Message):
     await message.answer("📂 Выберите категорию:", reply_markup=get_categories_slider(categories))
 
 
-@router.callback_query(lambda c: c.data.startswith("category_"))
+@router.callback_query(lambda c: c.data.startswith("category_selected_"))
 async def category_selected(callback: types.CallbackQuery):
     """Обработка выбора категории"""
-    category_id = callback.data.split("_")[1]
+    category_id = callback.data.split("_")[2]
     category_id = None if category_id == "0" else int(category_id)
-    category_name = callback.data.split("_")[2]
+    category_name = callback.data.split("_")[3]
 
     styles = await api_client.get_styles_list(category_id)
 
