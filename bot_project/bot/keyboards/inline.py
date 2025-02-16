@@ -34,15 +34,6 @@ def get_styles_keyboard(styles, category_id=None):
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
 
-def god_mode_keyboard():
-    """Клавиатура включения/выключения режима 'Бога'"""
-    buttons = [
-        [InlineKeyboardButton(text="🔮 Включить режим Бога", callback_data="godmode_enable")],
-        [InlineKeyboardButton(text="❌ Выключить режим Бога", callback_data="godmode_disable")]
-    ]
-    return InlineKeyboardMarkup(inline_keyboard=buttons)
-
-
 
 def profile_keyboard():
     """Клавиатура профиля"""
@@ -163,3 +154,22 @@ def photo_format_keyboard():
         for format_option in PHOTO_FORMATS.keys()
     ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+
+def god_mode_keyboard(is_enabled: bool):
+    """Клавиатура включения/выключения режима 'Бога'"""
+    buttons = [
+        [InlineKeyboardButton(
+            text="❌ Выключить режим Бога" if is_enabled else "🔮 Включить режим Бога",
+            callback_data="godmode_toggle"
+        )],
+        [InlineKeyboardButton(text="ℹ Инструкция", callback_data="godmode_instruction")]
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+
+def god_mode_instruction_keyboard():
+    """Клавиатура для инструкции режима Бога"""
+    return InlineKeyboardMarkup(
+        inline_keyboard=[[InlineKeyboardButton(text="🔙 Назад", callback_data="godmode_menu")]]
+    )

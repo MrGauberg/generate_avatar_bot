@@ -2,51 +2,91 @@
 
 from aiogram import Router, types
 from bot.services.api_client import api_client
-from bot.keyboards.inline import god_mode_keyboard
+from bot.keyboards.inline import god_mode_keyboard, god_mode_instruction_keyboard
 
 router = Router()
-enabled_users = set()  # Храним пользователей с активированным режимом "Бога"
 
 
-@router.callback_query(lambda c: c.data == "menu_god_mode")
+
+@router.message(lambda message: message.text == "🔮 Режим Бога")
+async def god_mode_button_handler(message: types.Message):
+    """Обработка кнопки 'Режим Бога'"""
+    user_id = message.from_user.id
+    user_data = await api_client.get_user_profile(user_id)
+    is_god_mode_enabled = user_data.get("god_mode", False)
+
+    await message.answer(
+        "🔮 **Режим Бога**\n\n"
+        "Этот режим позволяет генерировать изображения по текстовому описанию.",
+        reply_markup=god_mode_keyboard(is_god_mode_enabled)
+    )
+
+
+@router.callback_query(lambda c: c.data == "godmode_menu")
 async def god_mode_menu_callback(callback: types.CallbackQuery):
-    """Обработка нажатия кнопки 'Режим Бога'"""
+    """Возвращение в главное меню режима Бога"""
+    user_id = callback.from_user.id
+    user_data = await api_client.get_user_profile(user_id)
+    is_god_mode_enabled = user_data.get("god_mode", False)
+
     await callback.message.edit_text(
-        "🔮 Хочешь активировать режим 'Бога'? Он позволяет создавать изображения по тексту!",
-        reply_markup=god_mode_keyboard()
+        "🔮 **Режим Бога**\n\n"
+        "Этот режим позволяет генерировать изображения по текстовому описанию.",
+        reply_markup=god_mode_keyboard(is_god_mode_enabled)
     )
     await callback.answer()
 
 
-@router.callback_query(lambda c: c.data == "godmode_enable")
-async def enable_god_mode_callback(callback: types.CallbackQuery):
-    """Обработка включения режима 'Бога'"""
+@router.callback_query(lambda c: c.data == "godmode_instruction")
+async def god_mode_instruction_callback(callback: types.CallbackQuery):
+    """Вывод инструкции по режиму Бога"""
+    await callback.message.edit_text(
+        "ℹ **Инструкция по режиму Бога**\n\n"
+        "В этом режиме ты можешь просто написать боту описание изображения, и он его сгенерирует!\n\n"
+        "📌 Например: *'Космический кот в очках'*\n\n"
+        "Нажми кнопку 'Назад', чтобы вернуться.",
+        reply_markup=god_mode_instruction_keyboard(),
+        parse_mode="Markdown"
+    )
+    await callback.answer()
+
+
+@router.callback_query(lambda c: c.data == "godmode_toggle")
+async def toggle_god_mode_callback(callback: types.CallbackQuery):
+    """Включение/выключение режима Бога"""
+    user_id = callback.from_user.id
+    user_data = await api_client.get_user_profile(user_id)
+    is_god_mode_enabled = user_data.get("god_mode", False)
+
     try:
-        await api_client.enable_god_mode()
-        enabled_users.add(callback.from_user.id)  # Добавляем пользователя в список активных
-        await callback.message.edit_text("✅ Режим 'Бога' активирован! Теперь отправьте описание для генерации.")
+        await api_client.set_god_mode(user_id, not is_god_mode_enabled)
+
+        user_data = await api_client.get_user_profile(user_id)
+        is_god_mode_enabled = user_data.get("god_mode", False)
+
+        new_text = (
+            "✅ **Режим Бога активирован!**\n\nНапиши описание боту, и он сгенерирует изображение."
+            if is_god_mode_enabled else "❌ **Режим Бога деактивирован.**"
+        )
+
+        await callback.message.edit_text(new_text, reply_markup=god_mode_keyboard(is_god_mode_enabled))
+
     except Exception as e:
-        await callback.message.edit_text(f"❌ Ошибка при включении режима 'Бога': {e}")
+        await callback.message.edit_text(f"❌ Ошибка: {e}")
 
     await callback.answer()
 
 
-@router.callback_query(lambda c: c.data == "godmode_disable")
-async def disable_god_mode_callback(callback: types.CallbackQuery):
-    """Обработка выключения режима 'Бога'"""
-    try:
-        await api_client.disable_god_mode()
-        enabled_users.discard(callback.from_user.id)  # Удаляем пользователя из списка активных
-        await callback.message.edit_text("❌ Режим 'Бога' выключен.")
-    except Exception as e:
-        await callback.message.edit_text(f"❌ Ошибка при выключении режима 'Бога': {e}")
-
-    await callback.answer()
-
-
-@router.message(lambda message: message.text and message.from_user.id in enabled_users)
+@router.message(lambda message: message.text)
 async def generate_image_in_god_mode(message: types.Message):
     """Генерация изображения по текстовому описанию в режиме 'Бога'"""
+    user_id = message.from_user.id
+    user_data = await api_client.get_user_profile(user_id)
+    is_god_mode_enabled = user_data.get("god_mode", False)
+
+    if not is_god_mode_enabled:
+        return
+
     try:
         response = await api_client.generate_user_image(prompt=message.text, model_id=1)
         image_url = response.get("image_url")
