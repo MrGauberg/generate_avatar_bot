@@ -15,6 +15,7 @@ import logging
 import aiofiles
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.fsm.context import FSMContext
+from bot.utils.auth import require_authorization
 
 from bot.services.redis_client import redis_client
 
@@ -138,6 +139,7 @@ async def handle_gender_choice(callback: types.CallbackQuery, bot: Bot):
 
 
 @router.message(lambda message: message.text == "🖼 Аватар")
+@require_authorization
 async def avatar_button_handler(message: types.Message):
     """Обработка кнопки 'Аватар'"""
     await message.answer(
