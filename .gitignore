@@ -192,9 +192,9 @@ ssl/*
 
 staticfiles/
 
-# # Игнорируем все каталоги миграций
-# **/migrations/*
-# # Отменяем игнорирование папки migrations и файла __init__.py
-# !**/migrations/__init__.py
-# !**/migrations
-# **/migrations/0001_initial.py
+# Игнорируем все каталоги миграций
+**/migrations/*
+# Отменяем игнорирование папки migrations и файла __init__.py
+!**/migrations/__init__.py
+!**/migrations
+**/migrations/0001_initial.py
