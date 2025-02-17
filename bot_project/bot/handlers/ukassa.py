@@ -44,7 +44,7 @@ async def process_email(message: types.Message, state: FSMContext):
             "💰 Выберите пакет генераций:",
             reply_markup=InlineKeyboardMarkup(inline_keyboard=buttons)
         )
-        await state.set_state(PaymentState.waiting_for_email)
+        await state.clear()
 
     except Exception as e:
         logging.error(f"Ошибка получения пакетов: {e}")

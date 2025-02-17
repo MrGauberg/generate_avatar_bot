@@ -62,6 +62,8 @@ async def handle_photo_upload(message: types.Message):
         # Обновляем список фото и считаем их количество
         photos = await redis_client.get_photos(user_id)
         uploaded_count = len(photos)
+        
+        await message.answer(f"📷 Принято! Загружено {uploaded_count}/{MAX_PHOTOS} фото.")
 
         if uploaded_count == MAX_PHOTOS:
             await redis_client.set_user_state(user_id, "waiting_for_gender")
@@ -70,8 +72,6 @@ async def handle_photo_upload(message: types.Message):
                 "✅ Все фото загружены!\nВыберите пол аватара:",
                 reply_markup=gender_selection_keyboard(genders),
             )
-        else:
-            await message.answer(f"📷 Принято! Загружено {uploaded_count}/{MAX_PHOTOS} фото.")
 
 
 
