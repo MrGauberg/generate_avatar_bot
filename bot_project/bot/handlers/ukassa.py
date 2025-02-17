@@ -44,7 +44,6 @@ async def process_email(message: types.Message, state: FSMContext):
             "💰 Выберите пакет генераций:",
             reply_markup=InlineKeyboardMarkup(inline_keyboard=buttons)
         )
-        await state.clear()
 
     except Exception as e:
         logging.error(f"Ошибка получения пакетов: {e}")
@@ -90,6 +89,7 @@ async def create_payment(callback: types.CallbackQuery, state: FSMContext):
                 f"✅ Оплата создана! Перейдите по ссылке:",
                 reply_markup=pay_keyboard(payment_url)
             )
+            await state.clear()
         else:
             await message.edit_text("❌ Ошибка при создании платежа.")
     except Exception as e:
