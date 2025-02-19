@@ -47,7 +47,7 @@ class LeonardoService:
         :return: dataset_id или ошибка
         """
         url = f"{LEONARDO_BASE_URL}/datasets"
-        response = requests.post(url, headers=HEADERS)
+        response = requests.post(url, headers=HEADERS, data={"name": f"dataset_{avatar_id}"})
 
         if response.status_code == 201:
             dataset_id = response.json().get("datasetId")

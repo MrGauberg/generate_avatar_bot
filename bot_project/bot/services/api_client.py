@@ -72,6 +72,7 @@ class APIClient:
                     await self.refresh_access_token()
                     headers["Authorization"] = f"Bearer {self.access_token}"
                     response = await self.client.request(method, url, json=data, headers=headers)
+                    print(response.json())
                     response.raise_for_status()
                     return response.json()
                 except httpx.HTTPStatusError as refresh_error:
