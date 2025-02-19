@@ -64,23 +64,23 @@ class AvatarUploadView(APIView):
 
         # Создаем датасет
         print("Создаем датасет")
-        # dataset_response = LeonardoService.create_dataset(avatar_id)
-        dataset_response = {"dataset_id": 99, "status": "success"}
+        dataset_response = LeonardoService.create_dataset(avatar_id)
+        # dataset_response = {"dataset_id": 99, "status": "success"}
 
         if "error" in dataset_response:
             return Response(dataset_response, status=status.HTTP_400_BAD_REQUEST)
 
         # Загружаем изображения в датасет
-        # upload_response = LeonardoService.upload_images_to_dataset(avatar_id)
-        upload_response = {"status": "success"}
+        upload_response = LeonardoService.upload_images_to_dataset(avatar_id)
+        # upload_response = {"status": "success"}
 
         if "error" in upload_response:
             return Response(upload_response, status=status.HTTP_400_BAD_REQUEST)
 
         # Запускаем обучение модели
         model_name = f"{user.username}_avatar_model"
-        # train_response = LeonardoService.train_model(avatar_id, model_name)
-        train_response = {"model_id": 77, "status": "training"}
+        train_response = LeonardoService.train_model(avatar_id, model_name)
+        # train_response = {"model_id": 77, "status": "training"}
 
         if "error" in train_response:
             return Response(train_response, status=status.HTTP_400_BAD_REQUEST)

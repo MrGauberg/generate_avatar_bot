@@ -62,7 +62,7 @@ async def handle_photo_upload(message: types.Message):
         # Обновляем список фото и считаем их количество
         photos = await redis_client.get_photos(user_id)
         uploaded_count = len(photos)
-        
+
         await message.answer(f"📷 Принято! Загружено {uploaded_count}/{MAX_PHOTOS} фото.")
 
         if uploaded_count == MAX_PHOTOS:
@@ -200,7 +200,7 @@ async def activate_avatar_handler(callback: types.CallbackQuery):
         response = await api_client.activate_avatar(avatar_id)
         if not response.get("error"):
             await callback.message.edit_text(
-                f"Модель {avatar_name} выбрана, теперь генерируем фотографии с этой моделью✅"
+                f"Модель {avatar_name} №{avatar_id} выбрана, теперь генерируем фотографии с этой моделью✅"
             )
         else:
             await callback.message.edit_text("❌ Ошибка при выборе аватара.")
