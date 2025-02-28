@@ -169,3 +169,6 @@ CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "http://localhost:8080/
 API_URL = os.getenv("API_URL")
 ADMIN_TG = os.getenv("ADMIN_TG")
 BOT_TG = os.getenv("BOT_TG")
+
+
+PAYMENT_REMINDER_DELAY = int(os.getenv("PAYMENT_REMINDER_DELAY", 1440))
