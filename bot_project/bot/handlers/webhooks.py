@@ -6,7 +6,7 @@ from bot.config import Settings
 import logging
 
 from bot.services.redis_client import redis_client
-from bot_project.bot.keyboards.inline import get_packages_keyboard
+from bot.keyboards.inline import get_packages_keyboard
 
 bot = Bot(token=Settings.bot.TOKEN)
 
