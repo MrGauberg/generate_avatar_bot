@@ -5,7 +5,7 @@ from aiogram import Router, types
 from aiogram.filters import StateFilter
 
 from bot.services.api_client import api_client
-from bot.keyboards.inline import god_mode_keyboard, god_mode_instruction_keyboard
+from bot.keyboards.inline import get_packages_keyboard, god_mode_keyboard, god_mode_instruction_keyboard
 from bot.utils.auth import require_authorization
 
 router = Router()
@@ -99,6 +99,14 @@ async def generate_image_in_god_mode(message: types.Message):
     is_god_mode_enabled = user_data.get("god_mode", False)
 
     if not is_god_mode_enabled:
+        return
+    
+    remaining_generations = await api_client.get_user_generations(user_id)
+    if remaining_generations <= 0:
+        await message.answer(
+            "⚠ К сожалению, у вас закончились генерации.",
+            reply_markup=get_packages_keyboard()
+        )
         return
 
     try:

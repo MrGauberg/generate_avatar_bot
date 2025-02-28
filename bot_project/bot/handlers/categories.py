@@ -2,7 +2,7 @@
 
 from aiogram import Router, types
 from bot.services.api_client import api_client
-from bot.keyboards.inline import get_categories_slider, get_styles_slider
+from bot.keyboards.inline import get_categories_slider, get_packages_keyboard, get_styles_slider
 from bot.utils.auth import require_authorization
 
 router = Router()
@@ -55,6 +55,18 @@ async def style_pagination_handler(callback: types.CallbackQuery):
 async def style_selected(callback: types.CallbackQuery):
     """Обработка выбора стиля"""
     style_id = int(callback.data.split("_")[1])
+    user_id = callback.from_user.id
+
+
+    # Проверяем, есть ли у пользователя генерации
+    remaining_generations = await api_client.get_user_generations(user_id)
+    if remaining_generations <= 0:
+        await callback.message.edit_text(
+            "⚠ К сожалению, у вас закончились генерации.",
+            reply_markup=get_packages_keyboard()
+        )
+        await callback.answer()
+        return
 
     await callback.message.edit_text("⏳ Генерируем изображение, подождите...")
 

@@ -36,11 +36,19 @@ class PackageViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_user_packages(self, request, user_tg_id):
+        """Возвращает список пакетов с доступными генерациями для пользователя"""
         user = get_object_or_404(User, telegram_id=user_tg_id)
-        
-        avatars = self.get_queryset().filter(user=user).filter(generations_remains__gt=0)
-        serializer = self.get_serializer(avatars, many=True)
+        packages = self.get_queryset().filter(user=user, generations_remains__gt=0)
+        serializer = self.get_serializer(packages, many=True)
         return Response(serializer.data)
+
+    def get_total_generations(self, request, user_tg_id):
+        """Возвращает общее количество доступных генераций у пользователя"""
+        user = get_object_or_404(User, telegram_id=user_tg_id)
+
+        total_generations = self.get_queryset().filter(user=user).aggregate(Sum("generations_remains"))["generations_remains__sum"] or 0
+
+        return Response({"user_tg_id": user_tg_id, "total_generations": total_generations})
 
 
 

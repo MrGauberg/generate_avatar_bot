@@ -47,15 +47,17 @@ class LeonardoService:
         :return: dataset_id или ошибка
         """
         url = f"{LEONARDO_BASE_URL}/datasets"
-        response = requests.post(url, headers=HEADERS, data={"name": f"dataset_{avatar_id}"})
+        response = requests.post(url, headers=HEADERS, json={"name": f"dataset_{avatar_id}"})
 
-        if response.status_code == 201:
-            dataset_id = response.json().get("datasetId")
-            avatar = Avatar.objects.get(id=avatar_id)
-            avatar.dataset_id = dataset_id
-            avatar.save()
-            return {"dataset_id": dataset_id, "status": "success"}
-
+        if not "error" in response.json():
+            insert_datasets_one = response.json().get("insert_datasets_one")
+            if insert_datasets_one:
+                dataset_id = insert_datasets_one.get("id")
+                if dataset_id:
+                    avatar = Avatar.objects.get(id=avatar_id)
+                    avatar.dataset_id = dataset_id
+                    avatar.save()
+                    return {"dataset_id": dataset_id, "status": "success"}
         return {"error": response.json(), "status": "failed"}
 
     @staticmethod
@@ -118,16 +120,21 @@ class LeonardoService:
         if not avatar.dataset_id:
             return {"error": "Dataset ID not found", "status": "failed"}
 
-        url = f"{LEONARDO_BASE_URL}/models/train"
-        payload = {"datasetId": avatar.dataset_id, "name": model_name}
+        url = f"{LEONARDO_BASE_URL}/models"
+        payload = {"datasetId": avatar.dataset_id, "name": model_name, "instance_prompt":avatar.gender.gender}
 
         response = requests.post(url, json=payload, headers=HEADERS)
 
-        if response.status_code == 202:
-            model_id = response.json().get("modelId")
-            avatar.model_id = model_id
-            avatar.save()
-            return {"model_id": model_id, "status": "training"}
+        if not "error" in response.json():
+            taraining_job = response.json().get("sdTrainingJob")
+            if taraining_job:
+                model_id = taraining_job.get("customModelId")
+                if model_id:
+                    api_credit_cost = taraining_job.get("apiCreditCost")
+                    avatar.model_id = model_id
+                    avatar.api_credit_cost = api_credit_cost
+                    avatar.save()
+                    return {"model_id": model_id, "status": "training", "api_credit_cost": api_credit_cost}
 
         return {"error": response.json(), "status": "failed"}
 
@@ -145,18 +152,24 @@ class LeonardoService:
 
         response = requests.post(url, json=payload, headers=HEADERS)
 
-        if response.status_code == 201:
-            data = response.json()
-            LeonardoGeneration.objects.create(
-                user=user,
-                model_id=model_id,
-                prompt=prompt,
-                width=width,
-                height=height,
-                guidance=guidance,
-                generation_id=data["generationId"],
-                status="pending",
-            )
-            return {"generation_id": data["generationId"], "status": "started"}
+        print(response.json())
+        if not "error" in response.json():
+            sd_generation_job = response.json().get("sdGenerationJob")
+            if sd_generation_job:
+                generation_id = sd_generation_job.get("generationId")
+                if generation_id:
+                    api_credit_cost = sd_generation_job.get("apiCreditCost")
+                    LeonardoGeneration.objects.create(
+                        user=user,
+                        model_id=model_id,
+                        prompt=prompt,
+                        width=width,
+                        height=height,
+                        guidance=guidance,
+                        generation_id=generation_id,
+                        status="pending",
+                        api_credit_cost=api_credit_cost,
+                    )
+                    return {"generation_id": generation_id, "status": "started", "api_credit_cost": api_credit_cost}
 
         return {"error": response.json(), "status": "failed"}

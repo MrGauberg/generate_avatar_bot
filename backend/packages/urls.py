@@ -11,4 +11,5 @@ router.register(r'package-types', PackageTypeViewSet, basename='package-type')
 urlpatterns = [
     path('', include(router.urls)),
     path('user-packages/<int:user_tg_id>/', PackageViewSet.as_view({'get': 'get_user_packages'}), name='user-packages'),
+    path('total-generations/<int:user_tg_id>/', PackageViewSet.as_view({'get': 'get_total_generations'}), name='total-generations'),
 ]

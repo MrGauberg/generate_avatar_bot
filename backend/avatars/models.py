@@ -27,6 +27,7 @@ class Avatar(models.Model):
     model_id = models.CharField(max_length=100, unique=True, blank=True, null=True)
     gender = models.ForeignKey(AvatarGender, on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    api_credit_cost = models.IntegerField(default=0)
     is_active = models.BooleanField(default=False)
 
     def __str__(self):
