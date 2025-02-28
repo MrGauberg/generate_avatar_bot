@@ -11,8 +11,8 @@ BOT_WEBHOOK_URL = f"{settings.API_URL}/bot/payment-reminder/"
 @shared_task
 def check_unpaid_payments():
     """
-    Проверяет неоплаченные платежи (`pending` и `canceled`), созданные более 24 часов назад, 
-    и отправляет вебхук в бота для напоминания пользователю.
+    Проверяет неоплаченные платежи (`pending` и `canceled`), созданные более X минут назад, 
+    отправляет вебхук в бота и удаляет их после напоминания.
     """
     expired_time = now() - timedelta(minutes=settings.PAYMENT_REMINDER_DELAY)
 
@@ -36,6 +36,8 @@ def check_unpaid_payments():
             response.raise_for_status()
             notified_users.append(user_tg_id)
             print(f"✅ Напоминание отправлено пользователю {user_tg_id}")
+
+            payment.delete()
 
         except requests.RequestException as e:
             error_msg = f"❌ Ошибка отправки вебхука пользователю {user_tg_id}: {e}"
