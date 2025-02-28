@@ -34,7 +34,7 @@ async def generations_button_handler(event: types.Message | types.CallbackQuery)
             return
 
         if not user_packages:
-            await message.answer("❌ У вас нет активных пакетов генераций.")
+            await message.answer("❌ У вас нет активных пакетов генераций.", reply_markup=get_packages_keyboard())
             return
 
         packages_text = "\n".join(
