@@ -62,7 +62,7 @@ async def style_selected(callback: types.CallbackQuery):
     remaining_generations = await api_client.get_user_generations(user_id)
     if remaining_generations <= 0:
         await callback.message.edit_text(
-            "⚠ К сожалению, у вас закончились генерации.",
+            "К сожалению, у вас закончились генерации.",
             reply_markup=get_packages_keyboard()
         )
         await callback.answer()
