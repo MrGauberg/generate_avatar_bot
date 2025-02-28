@@ -1,18 +1,12 @@
 # packages/views.py
-import requests
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
+from django.db.models import Sum
 
-from core.tele_bot import tele_bot
 
 from .serializers import PackageSerializer, PackageTypeSerializer
-import uuid
-from django.conf import settings
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework import status
-from yookassa import Configuration, Payment
 from .models import Package, PackageType
 from django.contrib.auth import get_user_model
 
