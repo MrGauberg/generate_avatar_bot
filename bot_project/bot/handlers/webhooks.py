@@ -6,6 +6,7 @@ from bot.config import Settings
 import logging
 
 from bot.services.redis_client import redis_client
+from bot_project.bot.keyboards.inline import get_packages_keyboard
 
 bot = Bot(token=Settings.bot.TOKEN)
 
@@ -47,4 +48,33 @@ async def handle_payment_webhook(request):
 
     except Exception as e:
         logging.error(f"Ошибка обработки вебхука: {e}")
+        return web.json_response({"error": str(e)}, status=500)
+    
+
+
+async def handle_payment_reminder_webhook(request):
+    """Обработчик вебхука для напоминания о неоплаченной генерации"""
+    try:
+        data = await request.json()
+        user_id = data.get("user_id")
+
+        if not user_id:
+            return web.json_response({"error": "Missing user_id"}, status=400)
+
+        # Отправляем сообщение пользователю
+        message_text = (
+            "⚠ Видим, что вы не оплатили пакет генерации.\n\n"
+            "💡 Предлагаем вам попробовать один из наших пакетов:"
+        )
+
+        await bot.send_message(
+            chat_id=user_id,
+            text=message_text,
+            reply_markup=get_packages_keyboard()
+        )
+
+        return web.json_response({"message": "Payment reminder sent"}, status=200)
+
+    except Exception as e:
+        logging.error(f"Ошибка обработки вебхука напоминания об оплате: {e}")
         return web.json_response({"error": str(e)}, status=500)

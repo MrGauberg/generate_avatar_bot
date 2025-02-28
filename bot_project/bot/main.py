@@ -16,7 +16,7 @@ from bot.utils.logger import logger
 from bot.middlewares.throttle import ThrottleMiddleware
 from bot.handlers import instruction
 from bot.handlers import ukassa
-from bot.handlers.webhooks import handle_payment_webhook
+from bot.handlers.webhooks import handle_payment_reminder_webhook, handle_payment_webhook
 from aiogram.fsm.storage.redis import RedisStorage
 from aiohttp import web
 
@@ -45,19 +45,19 @@ async def create_dispatcher():
 
 async def start_webhook_server(dp: Dispatcher):
     """Запускаем веб-сервер для обработки вебхуков"""
-    link = "/payment-webhook/"
     port = 8090 
     ip = "0.0.0.0"
 
     app = web.Application()
     app["dp"] = dp  # Передаем Dispatcher в app
-    app.router.add_post(link, handle_payment_webhook)
+    app.router.add_post("/payment-webhook/", handle_payment_webhook)
+    app.router.add_post("/payment-reminder/", handle_payment_reminder_webhook)
 
     runner = web.AppRunner(app)
     await runner.setup()
     site = web.TCPSite(runner, ip, port)
     await site.start()
-    logging.info(f"Webhook server запущен на http://{ip}:{port}{link}")
+    logging.info(f"Webhook server запущен на http://{ip}:{port}")
 
 
 async def set_menu():
