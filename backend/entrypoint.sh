@@ -4,7 +4,7 @@ echo "Checking for model changes..."
 python3 manage.py makemigrations --noinput
 
 # echo "Applying migrations..."
-# python3 manage.py migrate
+python3 manage.py migrate
 
 echo "Collecting static files..."
 python3 manage.py collectstatic --noinput
