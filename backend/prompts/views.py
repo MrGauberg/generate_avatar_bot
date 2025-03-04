@@ -21,6 +21,9 @@ class PromptStyleViewSet(viewsets.ModelViewSet):
         telegram_id = self.request.query_params.get('telegram_id')
         if category_id and telegram_id:
             avatar = Avatar.objects.get(user__telegram_id=telegram_id)
-            return self.queryset.filter(category_id=category_id, gender=avatar.gender)
+            return self.queryset.filter(category_id=category_id, genders__in=[avatar.gender])
+        elif telegram_id:
+            avatar = Avatar.objects.get(user__telegram_id=telegram_id)
+            return self.queryset.filter(category_id=telegram_id, category_id__isnull=True)
         else:
             return self.queryset.filter(category_id__isnull=True)
