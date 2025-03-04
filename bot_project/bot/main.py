@@ -16,7 +16,7 @@ from bot.utils.logger import logger
 from bot.middlewares.throttle import ThrottleMiddleware
 from bot.handlers import instruction
 from bot.handlers import ukassa
-from bot.handlers.webhooks import handle_avatar_ready_webhook, handle_payment_reminder_webhook, handle_payment_webhook
+from bot.handlers.webhooks import handle_avatar_ready_webhook, handle_generation_ready_webhook, handle_payment_reminder_webhook, handle_payment_webhook
 from aiogram.fsm.storage.redis import RedisStorage
 from aiohttp import web
 
