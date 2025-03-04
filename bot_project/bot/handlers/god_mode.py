@@ -109,14 +109,11 @@ async def generate_image_in_god_mode(message: types.Message):
         )
         return
 
+    await message.answer("Изображения генерируются. Пожалуйста, подождите ⌛")
+    
     try:
-        response = await api_client.generate_user_image(prompt=message.text, model_id=1)
-        image_url = response.get("image_url")
-
-        if image_url:
-            await message.answer_photo(photo=image_url, caption="✨ Сгенерированное изображение!")
-        else:
-            await message.answer("❌ Ошибка генерации изображения.")
+        response = await api_client.generate_user_image(prompt=message.text)
     except Exception as e:
         await message.answer(f"❌ Ошибка: {e}")
+
 

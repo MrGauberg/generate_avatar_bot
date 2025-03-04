@@ -12,7 +12,8 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from yookassa import Configuration, Payment
+from avatars.tasks import check_element_ready_and_notify
+
 
 
 User = get_user_model()
@@ -80,16 +81,22 @@ class AvatarUploadView(APIView):
             return Response(upload_response, status=status.HTTP_400_BAD_REQUEST)
 
         # Запускаем обучение модели
-        model_name = f"{user.username}_avatar_model_{avatar_id}"
-        train_response = LeonardoService.train_model(avatar_id, model_name)
+        element_name = f"{user.username}_avatar_element_{avatar_id}"
+        train_response = LeonardoService.train_element(avatar_id, element_name)
         # train_response = {"model_id": 77, "status": "training"}
 
         if "error" in train_response:
             train_response["type"] = "train"
             return Response(train_response, status=status.HTTP_400_BAD_REQUEST)
 
+        check_element_ready_and_notify.delay(avatar_id)
+
         return Response(
-            {"avatar_id": avatar_id, "dataset_id": dataset_response["dataset_id"], "model_id": train_response["model_id"]},
+            {
+                "avatar_id": avatar_id,
+                "dataset_id": dataset_response["dataset_id"],
+                "model_id": train_response["model_id"]
+            },
             status=status.HTTP_201_CREATED
         )
 

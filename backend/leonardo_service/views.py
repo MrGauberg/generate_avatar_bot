@@ -5,26 +5,33 @@ from .models import LeonardoGeneration
 from .serializers import LeonardoGenerationSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from .services import LeonardoService
+from leonardo_service.tasks import check_generation_ready_and_notify
+
 
 class LeonardoGenerationViewSet(viewsets.ModelViewSet):
-    """ API для управления генерациями """
+    """API для управления генерациями"""
     queryset = LeonardoGeneration.objects.all()
     serializer_class = LeonardoGenerationSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        return self.queryset.filter(user=self.request.user)
-
-    @action(detail=True, methods=['get'])
-    def status(self, request, pk=None):
-        """ Получить статус генерации """
-        generation = self.get_object()
-        status = get_generation_status(generation.generation_id)
-        return Response(status)
-
-    @action(detail=True, methods=['get'])
-    def results(self, request, pk=None):
-        """ Получить изображения после генерации """
-        generation = self.get_object()
-        images = get_generated_images(generation.generation_id)
-        return Response(images)
+    def generate(self, request):
+        """
+        Эндпоинт для генерации изображений.
+        Ожидает параметр prompt в теле запроса.
+        При успешной генерации запускается celery-задача для периодической проверки статуса генерации.
+        """
+        prompt = request.data.get("prompt")
+        if not prompt:
+            return Response({"error": "Параметр 'prompt' обязателен."}, status=400)
+        
+        # Вызов генерации изображения через LeonardoService
+        result = LeonardoService.generate_image(request.user, prompt)
+        if "error" in result:
+            return Response(result, status=400)
+        
+        generation_id = result.get("generation_id")
+        # Импорт celery-задачи и её запуск для проверки статуса генерации каждую секунду
+        check_generation_ready_and_notify.delay(generation_id)
+        
+        return Response(result, status=201)

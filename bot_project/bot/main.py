@@ -16,7 +16,7 @@ from bot.utils.logger import logger
 from bot.middlewares.throttle import ThrottleMiddleware
 from bot.handlers import instruction
 from bot.handlers import ukassa
-from bot.handlers.webhooks import handle_payment_reminder_webhook, handle_payment_webhook
+from bot.handlers.webhooks import handle_avatar_ready_webhook, handle_payment_reminder_webhook, handle_payment_webhook
 from aiogram.fsm.storage.redis import RedisStorage
 from aiohttp import web
 
@@ -52,6 +52,8 @@ async def start_webhook_server(dp: Dispatcher):
     app["dp"] = dp  # Передаем Dispatcher в app
     app.router.add_post("/payment-webhook/", handle_payment_webhook)
     app.router.add_post("/payment-reminder/", handle_payment_reminder_webhook)
+    app.router.add_post("/element-ready/", handle_avatar_ready_webhook)
+    app.router.add_post("/generation-ready/", handle_generation_ready_webhook)
 
     runner = web.AppRunner(app)
     await runner.setup()

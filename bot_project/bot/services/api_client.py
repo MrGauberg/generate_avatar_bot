@@ -86,13 +86,6 @@ class APIClient:
                 raise
 
 
-    async def get_user_generations(self, user_id: int) -> int:
-        """Получение количества оставшихся генераций у пользователя"""
-        url = f"{self.base_api_url}/packages/total-generations/{user_id}/"
-        response = await self._make_request("GET", url)
-        return response.get("total_generations", 0)
-
-
     async def set_photo_format(self, user_id: int, photo_format: str) -> Any:
         url = f"{self.base_api_url}/users/set_photo_format/{user_id}/"
         return await self._make_request("POST", url, {"photo_format": photo_format})
@@ -155,10 +148,10 @@ class APIClient:
         url = f"{self.base_api_url}/prompts/categories/"
         return await self._make_request("GET", url)
 
-    async def generate_user_image(self, prompt: str, model_id: int) -> Any:
+    async def generate_user_image(self, prompt: str) -> Any:
         """Генерация изображения"""
         url = f"{self.base_api_url}/generations/"
-        data = {"prompt": prompt, "model_id": model_id}
+        data = {"prompt": prompt}
         return await self._make_request("POST", url, data)
 
     async def enable_god_mode(self) -> Any:

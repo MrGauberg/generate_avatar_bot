@@ -108,11 +108,11 @@ class LeonardoService:
         return {"status": "uploaded"}
 
     @staticmethod
-    def train_model(avatar_id, model_name):
+    def train_element(avatar_id, element_name):
         """
-        Обучает кастомную модель на основе датасета и сохраняет её в аватар.
+        Обучает кастомный элемент на основе датасета и сохраняет её в аватар.
         :param avatar_id: ID аватара
-        :param model_name: название кастомной модели
+        :param element_name: название кастомного элемента
         :return: model_id или ошибка
         """
         avatar = Avatar.objects.get(id=avatar_id)
@@ -121,38 +121,98 @@ class LeonardoService:
             return {"error": "Dataset ID not found", "status": "failed"}
 
         url = f"{LEONARDO_BASE_URL}/models"
-        payload = {"datasetId": avatar.dataset_id, "name": model_name, "instance_prompt":avatar.gender.gender}
+        payload = {
+            "datasetId": avatar.dataset_id,
+            "name": element_name,
+            "instance_prompt":avatar.gender.gender,
+            "resolution": 512,
+            "focus": "Character",
+            "status": "COMPLETE",
+            "baseModel": "SDXL_1_0",
+            "learningRate": 0.000001,
+            "trainingEpoch": 100,
+            "instancePrompt": "a photorealistic image of elena_face_1",
+            "trainTextEncoder": True
+        }
 
         response = requests.post(url, json=payload, headers=HEADERS)
 
         if not "error" in response.json():
             taraining_job = response.json().get("sdTrainingJob")
             if taraining_job:
-                model_id = taraining_job.get("customModelId")
-                if model_id:
+                element_id = taraining_job.get("userLoraId")
+                if element_id:
                     api_credit_cost = taraining_job.get("apiCreditCost")
-                    avatar.model_id = model_id
+                    avatar.model_id = element_id
                     avatar.api_credit_cost = api_credit_cost
                     avatar.save()
-                    return {"model_id": model_id, "status": "training", "api_credit_cost": api_credit_cost}
+                    return {"model_id": element_id, "status": "training", "api_credit_cost": api_credit_cost}
 
         return {"error": response.json(), "status": "failed"}
+    
 
     @staticmethod
-    def generate_image(user, model_id, prompt, width=512, height=512, guidance=7.5):
+    def check_element_status(element_id):
+        """
+        Проверяет готовность натренированного элемента по его ID.
+        Возвращает статус элемента и все полученные данные.
+        
+        :param element_id: ID элемента для проверки
+        :return: словарь с результатами проверки или информацией об ошибке
+        """
+        url = f"{LEONARDO_BASE_URL}/elements/{element_id}"
+        response = requests.get(url, headers=HEADERS)
+        
+        try:
+            data = response.json()
+        except json.JSONDecodeError:
+            return {"error": "Невозможно декодировать ответ", "status": "failed"}
+        
+        if response.status_code == 200:
+            element_status = data.get("status")
+            if element_status == "COMPLETE":
+                return {"element_id": element_id, "status": "COMPLETE", "details": data}
+            else:
+                return {"element_id": element_id, "status": element_status, "details": data}
+        else:
+            return {"error": data, "status": "failed"}
+
+
+    @staticmethod
+    def generate_image(user, prompt):
         """Создаёт изображение с использованием обученной модели"""
         url = f"{LEONARDO_BASE_URL}/generations"
+
+        model_id = "5c232a9e-9061-4777-980a-ddc8e65647c6"
+        width=1024,
+        height=1024,
+        guidance_scale=7
         payload = {
-            "modelId": model_id,
-            "prompt": prompt,
-            "width": width,
+            "alchemy": True,
             "height": height,
-            "guidanceScale": guidance,
-        }
+            "modelId": model_id,
+            "num_images": 2,
+            "presetStyle": "NONE",
+            "prompt": "elena_face_1 with flowers in her hands. ",
+            "width": width,
+            "sd_version": "SDXL_LIGHTNING",
+            "userElements": [
+                {
+                "userLoraId": 35744,
+                "weight": 1
+                }
+            ],
+            "expandedDomain": True,
+            "highResolution": True,
+            "num_inference_steps": 25,
+            "photoReal": False,
+            "promptMagic": False,
+            "guidance_scale": 7,
+            "enhancePrompt": False
+            }
 
         response = requests.post(url, json=payload, headers=HEADERS)
 
-        print(response.json())
         if not "error" in response.json():
             sd_generation_job = response.json().get("sdGenerationJob")
             if sd_generation_job:
@@ -165,11 +225,32 @@ class LeonardoService:
                         prompt=prompt,
                         width=width,
                         height=height,
-                        guidance=guidance,
+                        guidance_scale=guidance_scale,
                         generation_id=generation_id,
                         status="pending",
                         api_credit_cost=api_credit_cost,
                     )
-                    return {"generation_id": generation_id, "status": "started", "api_credit_cost": api_credit_cost}
+                    return {"generation_id": generation_id, "status": "pending", "api_credit_cost": api_credit_cost}
 
         return {"error": response.json(), "status": "failed"}
+    
+    @staticmethod
+    def get_generation_details(generation_id):
+        """
+        Получает данные генерации по её ID.
+        
+        :param generation_id: ID генерации
+        :return: словарь с данными генерации или ошибкой
+        """
+        url = f"{LEONARDO_BASE_URL}/generations/{generation_id}"
+        response = requests.get(url, headers=HEADERS)
+        try:
+            data = response.json()
+        except json.JSONDecodeError:
+            return {"error": "Невозможно декодировать ответ", "status": "failed"}
+        
+        if response.status_code == 200:
+            return data
+        else:
+            return {"error": data, "status": "failed"}
+
