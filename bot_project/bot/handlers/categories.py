@@ -54,7 +54,7 @@ async def style_pagination_handler(callback: types.CallbackQuery):
 @router.callback_query(lambda c: c.data.startswith("style_"))
 async def style_selected(callback: types.CallbackQuery):
     """Обработка выбора стиля"""
-    prompt = int(callback.data.split("_")[1])
+    prompt = callback.data.split("_")[1]
     user_id = callback.from_user.id
 
 
