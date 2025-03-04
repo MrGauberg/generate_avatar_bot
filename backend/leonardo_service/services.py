@@ -192,7 +192,7 @@ class LeonardoService:
             "alchemy": True,
             "height": height,
             "modelId": model_id,
-            "num_images": 2,
+            "num_images": 1,
             "presetStyle": "NONE",
             "prompt": f"elena_face_1 {prompt}",
             "width": width,

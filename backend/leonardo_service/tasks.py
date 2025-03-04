@@ -5,7 +5,7 @@ import requests
 from django.conf import settings
 from avatars.models import Avatar
 from .models import LeonardoGeneration
-from .services import LeonardoService  # убедитесь, что импортируется корректно
+from .services import LeonardoService
 
 # URL вебхука для уведомления бота о готовности генерации
 WEBHOOK_GENERATION_READY_URL = f"{settings.API_URL}/bot/generation-ready/"

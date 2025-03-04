@@ -96,11 +96,12 @@ async def get_style_buttons(category_id):
 async def generate_image_callback(callback: types.CallbackQuery):
     """Обработка выбора стиля и генерация изображения"""
     style_id = int(callback.data.split("_")[1])
+    user_id = callback.from_user.id
 
     await callback.message.edit_text("⏳ Генерируем изображение, подождите...")
 
     try:
-        response = await api_client.generate_user_image(prompt="", model_id=style_id)
+        response = await api_client.generate_user_image(prompt="", user_id=user_id)
         image_url = response.get("image_url")
 
         if image_url:

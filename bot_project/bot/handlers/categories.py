@@ -71,7 +71,7 @@ async def style_selected(callback: types.CallbackQuery):
     await callback.message.edit_text("⏳ Генерируем изображение, подождите...")
 
     try:
-        response = await api_client.generate_user_image(prompt="", model_id=style_id)
+        response = await api_client.generate_user_image(prompt="", user_id=user_id)
         image_url = response.get("image_url")
 
         if image_url:

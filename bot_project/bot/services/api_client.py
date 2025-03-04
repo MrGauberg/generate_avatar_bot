@@ -154,10 +154,10 @@ class APIClient:
         url = f"{self.base_api_url}/prompts/categories/"
         return await self._make_request("GET", url)
 
-    async def generate_user_image(self, prompt: str) -> Any:
+    async def generate_user_image(self, prompt: str, user_id: int) -> Any:
         """Генерация изображения"""
         url = f"{self.base_api_url}/leonardo/generate/"
-        data = {"prompt": prompt}
+        data = {"prompt": prompt, "telegram_id": user_id}
         return await self._make_request("POST", url, data)
 
     async def enable_god_mode(self) -> Any:
