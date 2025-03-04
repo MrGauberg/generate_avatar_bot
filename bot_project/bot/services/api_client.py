@@ -156,7 +156,7 @@ class APIClient:
 
     async def generate_user_image(self, prompt: str) -> Any:
         """Генерация изображения"""
-        url = f"{self.base_api_url}/leonardo/generations/"
+        url = f"{self.base_api_url}/leonardo/generate/"
         data = {"prompt": prompt}
         return await self._make_request("POST", url, data)
 
