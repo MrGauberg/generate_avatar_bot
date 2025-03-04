@@ -16,8 +16,8 @@ class PromptCategory(models.Model):
 class PromptStyle(models.Model):
     name = models.CharField(max_length=100)
     category = models.ForeignKey(PromptCategory, on_delete=models.CASCADE, related_name='styles', null=True, blank=True)
-    prompt = models.TextField()
-    gender = models.ForeignKey(AvatarGender, on_delete=models.CASCADE, null=True, blank=True)
+    prompt = models.TextField(default='')
+    gender = models.ForeignKey(AvatarGender, on_delete=models.CASCADE, null=True, blank=True, default=None)
 
     def __str__(self):
         return f'{self.name} ({self.category.name})' if self.category else self.name
