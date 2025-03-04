@@ -11,5 +11,6 @@ class PromptCategoryAdmin(admin.ModelAdmin):
 class PromptStyleAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'category')
     search_fields = ('name', 'category__name')
+    filter_horizontal = ('genders',)
     list_filter = ('category',)
     ordering = ('id',)
