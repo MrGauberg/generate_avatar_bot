@@ -185,8 +185,8 @@ class LeonardoService:
         url = f"{LEONARDO_BASE_URL}/generations"
 
         model_id = "5c232a9e-9061-4777-980a-ddc8e65647c6"
-        width=1024,
-        height=1024,
+        width=1024
+        height=1024
         guidance_scale=7
         payload = {
             "alchemy": True,
