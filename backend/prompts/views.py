@@ -1,6 +1,8 @@
 # prompts/views.py
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
+
+from avatars.models import Avatar
 from .models import PromptCategory, PromptStyle
 from .serializers import PromptCategorySerializer, PromptStyleSerializer
 
@@ -16,7 +18,9 @@ class PromptStyleViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         category_id = self.request.query_params.get('category')
-        if category_id:
-            return self.queryset.filter(category_id=category_id)
+        telegram_id = self.request.query_params.get('telegram_id')
+        if category_id and telegram_id:
+            avatar = Avatar.objects.get(user__telegram_id=telegram_id)
+            return self.queryset.filter(category_id=category_id, gender=avatar.gender)
         else:
             return self.queryset.filter(category_id__isnull=True)

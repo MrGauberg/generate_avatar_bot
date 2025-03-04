@@ -86,9 +86,9 @@ async def get_category_buttons():
     return get_categories_keyboard(categories)
 
 
-async def get_style_buttons(category_id):
+async def get_style_buttons(category_id, user_id):
     """Создает inline-кнопки со стилями для выбранной категории"""
-    styles = await api_client.get_styles_list()
+    styles = await api_client.get_styles_list(user_id=user_id)
     return get_styles_keyboard(styles, category_id)
 
 

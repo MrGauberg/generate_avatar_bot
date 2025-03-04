@@ -142,11 +142,11 @@ class APIClient:
         url = f"{self.base_api_url}/avatars/{avatar_id}/activate/"
         return await self._make_request("PATCH", url)
 
-    async def get_styles_list(self, category_id: int = None) -> Any:
+    async def get_styles_list(self, category_id: int = None, user_id: int = None) -> Any:
         """Получение списка стилей"""
         url = f"{self.base_api_url}/prompts/styles/"
         if category_id:
-            url += f"?category={category_id}"
+            url += f"?category={category_id}&telegram_id={user_id}"
         return await self._make_request("GET", url)
 
     async def get_categories_list(self) -> Any:

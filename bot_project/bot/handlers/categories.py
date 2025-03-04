@@ -23,7 +23,7 @@ async def category_selected(callback: types.CallbackQuery):
     category_id = None if category_id == "0" else int(category_id)
     category_name = callback.data.split("_")[3]
 
-    styles = await api_client.get_styles_list(category_id)
+    styles = await api_client.get_styles_list(category_id, user_id=callback.from_user.id)
 
     await callback.message.edit_text(
         f"📂 **Категория: {category_name}**\n\nВыбери стиль и получи 2 фото:",
@@ -46,7 +46,7 @@ async def style_pagination_handler(callback: types.CallbackQuery):
     """Переключение страниц стилей"""
     page = int(callback.data.split("_")[2])
     category_id = int(callback.data.split("_")[3])
-    styles = await api_client.get_styles_list(category_id)
+    styles = await api_client.get_styles_list(category_id, user_id=callback.from_user.id)
     await callback.message.edit_text("📂 Выберите стиль и получите 2 фото:", reply_markup=get_styles_slider(styles, page))
     await callback.answer()
 
