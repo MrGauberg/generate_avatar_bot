@@ -14,3 +14,4 @@ class PromptStyleAdmin(admin.ModelAdmin):
     filter_horizontal = ('genders',)
     list_filter = ('category',)
     ordering = ('id',)
+    list_editable = ('genders',)
