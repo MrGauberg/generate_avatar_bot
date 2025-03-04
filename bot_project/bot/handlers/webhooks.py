@@ -7,7 +7,7 @@ import logging
 
 from bot.services.redis_client import redis_client
 from bot.keyboards.inline import get_packages_keyboard
-from bot_project.bot.keyboards.reply import main_menu_keyboard
+from bot.keyboards.reply import main_menu_keyboard
 from aiogram.types import InputMediaPhoto
 
 
