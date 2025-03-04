@@ -72,12 +72,6 @@ async def style_selected(callback: types.CallbackQuery):
 
     try:
         response = await api_client.generate_user_image(prompt=prompt, user_id=user_id)
-        image_url = response.get("image_url")
-
-        if image_url:
-            await callback.message.answer_photo(photo=image_url, caption="✨ Сгенерированное изображение!")
-        else:
-            await callback.message.answer("❌ Ошибка генерации изображения.")
     except Exception as e:
         await callback.message.answer(f"❌ Ошибка: {e}")
 
