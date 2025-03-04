@@ -9,7 +9,7 @@ class PromptCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(PromptStyle)
 class PromptStyleAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'category')
+    list_display = ('id', 'name', 'category', 'genders')
     search_fields = ('name', 'category__name')
     filter_horizontal = ('genders',)
     list_filter = ('category',)
