@@ -22,11 +22,13 @@ class LeonardoGenerationViewSet(viewsets.ModelViewSet):
         При успешной генерации запускается celery-задача для периодической проверки статуса генерации.
         """
         prompt = request.data.get("prompt")
+        print(prompt)
         if not prompt:
             return Response({"error": "Параметр 'prompt' обязателен."}, status=400)
         
         # Вызов генерации изображения через LeonardoService
         result = LeonardoService.generate_image(request.user, prompt)
+        print(result)
         if "error" in result:
             return Response(result, status=400)
         
