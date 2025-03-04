@@ -24,6 +24,7 @@ class Avatar(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="avatars")
     dataset_id = models.CharField(max_length=100, unique=True, blank=True, null=True)
     element_id = models.CharField(max_length=100, unique=True, blank=True, null=True)
+    element_name = models.CharField(max_length=100, blank=True, null=True)
     is_complete = models.BooleanField(default=False)
     gender = models.ForeignKey(AvatarGender, on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

@@ -171,6 +171,7 @@ class LeonardoService:
         if response.status_code == 200:
             element_status = data.get("status")
             if element_status == "COMPLETE":
+                Avatar.objects.filter(model_id=element_id).update(is_complete=True, element_name=data.get("name"))
                 return {"element_id": element_id, "status": "COMPLETE", "details": data}
             else:
                 return {"element_id": element_id, "status": element_status, "details": data}
@@ -193,7 +194,7 @@ class LeonardoService:
             "modelId": model_id,
             "num_images": 2,
             "presetStyle": "NONE",
-            "prompt": "elena_face_1 with flowers in her hands. ",
+            "prompt": f"elena_face_1 {prompt}",
             "width": width,
             "sd_version": "SDXL_LIGHTNING",
             "userElements": [
