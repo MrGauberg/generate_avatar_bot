@@ -214,7 +214,7 @@ def get_styles_slider(styles, page=0):
     category_id = paged_styles[0]["category"]
 
     for style in paged_styles:
-        buttons.append([InlineKeyboardButton(text=style["name"], callback_data=f"style_{style['id']}")])
+        buttons.append([InlineKeyboardButton(text=style["name"], callback_data=f"style_{style['prompt']}")])
 
     nav_buttons = []
     if start_index > 0:

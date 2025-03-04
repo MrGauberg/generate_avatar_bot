@@ -54,7 +54,7 @@ async def style_pagination_handler(callback: types.CallbackQuery):
 @router.callback_query(lambda c: c.data.startswith("style_"))
 async def style_selected(callback: types.CallbackQuery):
     """Обработка выбора стиля"""
-    style_id = int(callback.data.split("_")[1])
+    prompt = int(callback.data.split("_")[1])
     user_id = callback.from_user.id
 
 
@@ -71,7 +71,7 @@ async def style_selected(callback: types.CallbackQuery):
     await callback.message.edit_text("⏳ Генерируем изображение, подождите...")
 
     try:
-        response = await api_client.generate_user_image(prompt="", user_id=user_id)
+        response = await api_client.generate_user_image(prompt=prompt, user_id=user_id)
         image_url = response.get("image_url")
 
         if image_url:
