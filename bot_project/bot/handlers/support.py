@@ -1,5 +1,3 @@
-# bot/handlers/support.py
-
 from aiogram import Router, types
 from bot.keyboards.inline import support_keyboard
 

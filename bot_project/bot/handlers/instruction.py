@@ -1,6 +1,4 @@
 
-# bot/handlers/instruction.py
-
 from aiogram import Router, types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 import logging

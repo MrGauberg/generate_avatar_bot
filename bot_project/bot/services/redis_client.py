@@ -1,5 +1,3 @@
-# bot/services/redis_client.py
-
 import redis.asyncio as redis
 from bot.config import Settings
 

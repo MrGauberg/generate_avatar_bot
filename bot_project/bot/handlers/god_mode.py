@@ -1,5 +1,3 @@
-# bot/handlers/god_mode.py
-
 from aiogram import Router, types
 
 from aiogram.filters import StateFilter

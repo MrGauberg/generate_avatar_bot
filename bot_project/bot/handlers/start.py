@@ -1,5 +1,3 @@
-# bot/handlers/start.py
-
 from aiogram import Router, types
 from aiogram.filters import Command
 from bot.keyboards.inline import start_keyboard

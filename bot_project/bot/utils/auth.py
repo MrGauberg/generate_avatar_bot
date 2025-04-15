@@ -1,5 +1,3 @@
-# bot/utils/auth.py
-
 from aiogram import types
 from functools import wraps
 from bot.handlers.start import start_handler

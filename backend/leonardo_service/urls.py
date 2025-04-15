@@ -1,4 +1,3 @@
-# leonardo_service/urls.py
 from django.urls import path, include
 from .views import LeonardoGenerationViewSet
 

@@ -1,5 +1,3 @@
-# bot/handlers/categories.py
-
 from aiogram import Router, types
 from bot.services.api_client import api_client
 from bot.keyboards.inline import get_categories_slider, get_packages_keyboard, get_styles_slider

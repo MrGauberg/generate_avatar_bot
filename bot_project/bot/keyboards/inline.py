@@ -1,5 +1,3 @@
-# bot/keyboards/inline.py
-
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from bot.config import Settings
 from bot.services.api_client import api_client

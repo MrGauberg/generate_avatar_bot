@@ -1,5 +1,3 @@
-# bot/handlers/webhooks.py
-
 from aiohttp import web
 from aiogram import Bot
 from bot.config import Settings

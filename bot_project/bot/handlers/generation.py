@@ -1,5 +1,3 @@
-# bot/handlers/generation.py
-
 from aiogram import Router, types
 from bot.services.api_client import api_client
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton

@@ -1,5 +1,3 @@
-# bot/handlers/avatar.py
-
 from aiogram import Router, types, Bot
 from bot.services.api_client import api_client
 from bot.config import Settings

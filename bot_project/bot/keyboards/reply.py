@@ -1,5 +1,3 @@
-# bot/keyboards/reply.py
-
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
 def main_menu_keyboard():

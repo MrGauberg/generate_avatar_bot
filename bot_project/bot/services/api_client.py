@@ -1,5 +1,3 @@
-# bot/services/api_client.py
-
 import httpx
 from bot.config import Settings
 from typing import Dict, Any, List, Tuple

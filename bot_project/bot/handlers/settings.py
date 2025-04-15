@@ -1,5 +1,3 @@
-# bot/handlers/settings.py
-
 from aiogram import Router, types
 from bot.services.api_client import api_client
 from bot.keyboards.inline import photo_format_keyboard, settings_menu_keyboard
